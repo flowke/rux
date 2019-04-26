@@ -1,0 +1,25 @@
+{
+  "name": "rux",
+  "version": "1.0.0",
+  "description": "rux",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flowke/rux.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/flowke/rux/issues"
+  },
+  "homepage": "https://github.com/flowke/rux#readme",
+  "dependencies": {
+    "@vue/cli": "^3.6.3",
+    "create-react-app": "^3.0.0",
+    "webpack-chain": "^5.2.4"
+  }
+}
