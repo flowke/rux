@@ -9,9 +9,30 @@ const webpack = require('webpack');
 let isDevMode = env.NODE_ENV === 'development';
 let isProdMode = env.NODE_ENV === 'production';
 
+const cssRegex = /\.css$/;
+const cssModuleRegex = /\.module\.css$/;
+const sassRegex = /\.(scss|sass)$/;
+const sassModuleRegex = /\.module\.(scss|sass)$/;
+const lessRegex = /\.less$/;
+const lessModuleRegex = /\.module\.less$/;
+
+let getStyleLoaders = (cssOptions, preLoader) => {
+  const loaders = [
+    !isEnvProduction && require.resolve('style-loader'),
+    isEnvProduction && {
+      loader: MiniCssExtractPlugin.loader,
+      options: {},
+    },
+    {
+      loader: require.resolve('css-loader'),
+      options: cssOptions,
+    },
+    preLoader
+  ]
+  return loaders;
+};
+
 let cfg = new Config();
-
-
 
 cfg.merge({
   mode: env.NODE_ENV,
@@ -29,6 +50,11 @@ cfg.merge({
       ? '[name].[contenthash:8].chunk.js'
       : '[name].chunk.js',
   },
+
+  module: {
+
+  },
+
   plugin: {
     HtmlWebpackPlugin: {
       plugin: HtmlWebpackPlugin,
