@@ -6,7 +6,7 @@ let envs = {
 
 }
 
-module.exports = env
+module.exports = envs
 
 exports.stringified = Object.keys(envs).reduce((env, key) => {
   env[key] = JSON.stringify(envs[key]);

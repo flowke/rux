@@ -1,4 +1,4 @@
-const paths = require('../config/paths');
+const paths = require('../../config/paths');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const fs = require('fs');
