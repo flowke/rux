@@ -5,18 +5,28 @@ const fs = require('fs');
 const config = require('../../config/react.config.js');
 const serverConfig = require('../../config/server.config.js');
 const chalk = require('chalk');
+const tools = require('../utils/tools')
 
 let compiler = webpack(config.toConfig());
+
+let {port} = serverConfig;
 
 module.exports = function(){
   const devServer = new WebpackDevServer(compiler, serverConfig);
 
-  devServer.listen(3000, '0.0.0.0', err => {
+  devServer.listen(port, '0.0.0.0', err => {
     if (err) {
-      return console.log(err);
+      throw error
     }
 
-    console.log(chalk.cyan('Starting the development server...\n'));
+    compiler.hooks.done.tap('done', ()=>{
+
+      console.log(chalk.cyan('Starting the development server...\n'));
+      
+      tools.openBrowser(`http://localhost:${port}`)
+    })
+
+    
   })
 }
 

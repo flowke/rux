@@ -1,15 +1,18 @@
 const Config = require('webpack-chain'); 
 const env = require('./env'); 
 const paths = require('./paths');
+const path = require('path')
 const PnpWebpackPlugin = require('./plugin/pnp');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
+const babelConfig = require('./babel.config');
+const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
+const NyanProgressPlugin = require('nyan-progress-webpack-plugin');
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 
 let isDevMode = env.NODE_ENV === 'development';
 let isProdMode = env.NODE_ENV === 'production';
-
-
 
 const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
@@ -20,11 +23,18 @@ const lessModuleRegex = /\.module\.less$/;
 
 let getStyleLoaders = (cssOptions, preLoader={}) => {
   let loaders = {
-    styleLoader: !isProdMode ? require.resolve('style-loader'): undefined,
-    nimiCss: isProdMode ? {
-      loader: MiniCssExtractPlugin.loader,
-      options: {},
-    }: undefined,
+    ...!isProdMode?{
+      styleLoader: {
+        loader: require.resolve('style-loader')
+      }
+    }: {},
+
+    ...isProdMode ? {
+      nimiCss:{
+        loader: MiniCssExtractPlugin.loader,
+        options: { },
+      }
+    }: {},
     cssLoader: {
       loader: require.resolve('css-loader'),
       options: cssOptions,
@@ -54,123 +64,121 @@ cfg.merge({
       : '[name].chunk.js',
   },
 
-  // module: {
-  //   rule: {
-  //     // name: baseLoader
-  //     baseLoaders: {
-  //       oneOf: {
-  //         // name: image, 
-  //         image: {
-  //           test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
-  //           loader: require.resolve('url-loader'),
-  //           options: {
-  //             limit: 10000,
-  //             name: 'static/media/[name].[hash:8].[ext]',
-  //           },
-  //         },
-  //         // name: babel
-  //         // only handle app src js
-  //         babel: {
-  //           test: /\.(js|mjs|jsx|ts|tsx)$/,
-  //           include: paths.appSrc,
-  //           loader: require.resolve('babel-loader'),
-  //           options: {
-  //             configFile: './config/babel.config.js'
-  //           },
-  //         },
-  //         // name: css
-  //         css: {
-  //           test: cssRegex,
-  //           exclude: cssModuleRegex,
-  //           use: getStyleLoaders({
-  //             sourceMap: isProdMode,
-  //           }),
-  //           sideEffects: true,
-  //         },
-  //         // name: cssModule
-  //         cssMosule: {
-  //           test: cssModuleRegex,
-  //           use: getStyleLoaders({
-  //             importLoaders: 1,
-  //             sourceMap: isProdMode,
-  //             modules: true,
-  //           }),
-  //         },
-  //         // name: sass
-  //         sass: {
-  //           test: sassRegex,
-  //           exclude: sassModuleRegex,
-  //           use: getStyleLoaders(
-  //             {
-  //               sourceMap: isProdMode,
-  //             },
-  //             {
-  //               sassLoader: {
-  //                 loader: 'sass-loader'
-  //               }
-  //             }
-  //           ),
-  //           sideEffects: true,
-  //         },
-  //         // sassModule
-  //         sassModule: {
-  //           test: sassModuleRegex,
-  //           use: getStyleLoaders(
-  //             {
-  //               sourceMap: isProdMode,
-  //               modules: true,
-  //             },
-  //             {
-  //               sassLoader: {
-  //                 loader: 'sass-loader'
-  //               }
-  //             }
-  //           ),
-  //           sideEffects: true,
-  //         },
-  //         // name: less
-  //         less: {
-  //           test: lessRegex,
-  //           exclude: lessModuleRegex,
-  //           use: getStyleLoaders(
-  //             {
-  //               sourceMap: isProdMode,
-  //             },
-  //             {
-  //               lessLoader: {
-  //                 loader: 'less-loader'
-  //               }
-  //             }
-  //           ),
-  //           sideEffects: true,
-  //         },
-  //         // lessLoader
-  //         lessModule: {
-  //           test: lessModuleRegex,
-  //           use: getStyleLoaders(
-  //             {
-  //               sourceMap: isProdMode,
-  //               modules: true,
-  //             },
-  //             {
-  //               lessLoader: {
-  //                 loader: 'less-loader'
-  //               }
-  //             }
-  //           ),
-  //         },
-  //         // name: fileCallBack
-  //         fileCallBack: {
-  //           loader: require.resolve('file-loader'),
-  //           exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
-  //           options: {
-  //             name: 'static/media/[name].[hash:8].[ext]',
-  //           },
-  //         }
-  //       }
-  //     }
-  //   }
-  // },
+  module: {
+    rule: {
+      // name: baseLoader
+      baseLoaders: {
+        oneOf: {
+          // name: image, 
+          image: {
+            test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+            loader: require.resolve('url-loader'),
+            options: {
+              limit: 10000,
+              name: 'static/media/[name].[hash:8].[ext]',
+            },
+          },
+          // name: babel
+          // only handle app src js
+          babel: {
+            test: /\.(js|mjs|jsx|ts|tsx)$/,
+            include: [paths.appSrc],
+            loader: require.resolve('babel-loader'),
+            options: babelConfig(),
+          },
+          // name: css
+          css: {
+            test: cssRegex,
+            exclude: [cssModuleRegex],
+            use: getStyleLoaders({
+              sourceMap: isProdMode,
+            }),
+            sideEffects: true,
+          },
+          // name: cssModule
+          cssMosule: {
+            test: cssModuleRegex,
+            use: getStyleLoaders({
+              importLoaders: 1,
+              sourceMap: isProdMode,
+              modules: true,
+            }),
+          },
+          // name: sass
+          sass: {
+            test: sassRegex,
+            exclude: [sassModuleRegex],
+            use: getStyleLoaders(
+              {
+                sourceMap: isProdMode,
+              },
+              {
+                sassLoader: {
+                  loader: 'sass-loader'
+                }
+              }
+            ),
+            sideEffects: true,
+          },
+          // sassModule
+          sassModule: {
+            test: sassModuleRegex,
+            use: getStyleLoaders(
+              {
+                sourceMap: isProdMode,
+                modules: true,
+              },
+              {
+                sassLoader: {
+                  loader: 'sass-loader'
+                }
+              }
+            ),
+            sideEffects: true,
+          },
+          // name: less
+          less: {
+            test: lessRegex,
+            exclude: [lessModuleRegex],
+            use: getStyleLoaders(
+              {
+                sourceMap: isProdMode,
+              },
+              {
+                lessLoader: {
+                  loader: 'less-loader'
+                }
+              }
+            ),
+            sideEffects: true,
+          },
+          // lessLoader
+          lessModule: {
+            test: lessModuleRegex,
+            use: getStyleLoaders(
+              {
+                sourceMap: isProdMode,
+                modules: true,
+              },
+              {
+                lessLoader: {
+                  loader: 'less-loader'
+                }
+              }
+            ),
+          },
+          // name: fileCallBack
+          fileCallBack: {
+            loader: require.resolve('file-loader'),
+            exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
+            options: {
+              name: 'static/media/[name].[hash:8].[ext]',
+            },
+          }
+        }
+      }
+    }
+  },
 
   plugin: {
     HtmlWebpackPlugin: {
@@ -223,6 +231,28 @@ cfg.merge({
       }
     }: {},
 
+    WebpackBuildNotifier: {
+      plugin: WebpackBuildNotifierPlugin,
+      args: [{
+        suppressSuccess: 'initial'
+      }]
+    },
+    NyanProgressPlugin: {
+      plugin: NyanProgressPlugin,
+      args: [{
+        nyanCatSays: (progress, msg) => {
+          return progress === 1 ? 'done for you!' : Math.round(progress*100)+'%'
+        }
+      }]
+    },
+    FriendlyErrorsPlugin: {
+      plugin: FriendlyErrorsPlugin,
+      args: [{
+        clearConsole: false,
+      }]
+      
+    }
+
   },
 
   resolveLoader: {
@@ -235,5 +265,7 @@ cfg.merge({
   }
 
 })
+
+
 
 module.exports = cfg;

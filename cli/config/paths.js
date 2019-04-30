@@ -1,11 +1,13 @@
 const path = require('path');
 
+let cwd = process.cwd();
+
 module.exports = {
-  entryPoint: path.resolve('./src/entry.js'),
+  entryPoint: path.resolve('./src/app.js'),
   outputPath: path.resolve('./dist'),
   publicPath: '/',
   // 单页的 html 模板
-  appHtml: '',
+  appHtml: path.resolve('./src/index.html'),
   //  app 文件夹
-  appSrc: ''
+  appSrc: path.resolve('./src')
 }
