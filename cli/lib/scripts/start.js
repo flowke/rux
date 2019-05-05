@@ -2,12 +2,13 @@ const paths = require('../../config/paths');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const fs = require('fs');
-const config = require('../../config/react.config.js');
-const serverConfig = require('../../config/server.config.js');
+const configApi = require('../../config/react.config.js');
+const serverConfig = require('../../config/options').devServer;
 const chalk = require('chalk');
-const tools = require('../utils/tools')
+const tools = require('../utils/tools');
 
-let compiler = webpack(config.toConfig());
+
+let compiler = webpack(configApi.toConfig());
 
 let {port} = serverConfig;
 
