@@ -6,9 +6,12 @@ let envs = {
 
 }
 
-module.exports = envs
+const stringified = envs => {
+  return Object.keys(envs).reduce((env, key) => {
+    env[key] = JSON.stringify(envs[key]);
+    return env;
+  }, {})
+}
 
-exports.stringified = Object.keys(envs).reduce((env, key) => {
-  env[key] = JSON.stringify(envs[key]);
-  return env;
-}, {})
+module.exports = {row: envs, stringified}
+

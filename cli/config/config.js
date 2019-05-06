@@ -1,7 +1,6 @@
 const Config = require('webpack-chain'); 
 const env = require('./env'); 
-const paths = require('./paths');
-const path = require('path')
+const path = require('path');
 const PnpWebpackPlugin = require('./plugin/pnp');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -10,9 +9,19 @@ const babelConfig = require('./babel.config');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const NyanProgressPlugin = require('nyan-progress-webpack-plugin');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
+const options = require('./options');
 
-let isDevMode = env.NODE_ENV === 'development';
-let isProdMode = env.NODE_ENV === 'production';
+let {
+  clientEnv,
+  globalVar,
+  paths,
+} = options;
+
+// console.log(options);
+
+
+let isDevMode = clientEnv.NODE_ENV === 'development';
+let isProdMode = clientEnv.NODE_ENV === 'production';
 
 const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
@@ -48,7 +57,7 @@ let getStyleLoaders = (cssOptions, preLoader={}) => {
 let cfg = new Config();
 
 cfg.merge({
-  mode: env.NODE_ENV,
+  mode: clientEnv.NODE_ENV,
   devtool: isProdMode ? 'cheap-module-source-map' : 'source-map',
   entry: {
     app: [paths.entryPoint]
@@ -208,13 +217,12 @@ cfg.merge({
     },
     DefinePlugin: {
       plugin: webpack.DefinePlugin,
-      args: [
-        {
-          'process.env': env.stringified
-        }
-      ]
+      args: [env.stringified(globalVar)]
     },
-
+    EnvironmentPlugin: {
+      plugin: webpack.EnvironmentPlugin,
+      args: [env.stringified(clientEnv)]
+    },
     ...isDevMode ? {
       HotModuleReplacementPlugin: {
         plugin: webpack.HotModuleReplacementPlugin
