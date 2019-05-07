@@ -253,13 +253,13 @@ cfg.merge({
         }
       }]
     },
-    FriendlyErrorsPlugin: {
-      plugin: FriendlyErrorsPlugin,
-      args: [{
-        clearConsole: false,
-      }]
+    // FriendlyErrorsPlugin: {
+    //   plugin: FriendlyErrorsPlugin,
+    //   args: [{
+    //     clearConsole: false,
+    //   }]
       
-    }
+    // }
 
   },
 

@@ -26,6 +26,7 @@ function printBrowserOpenInfo(urls) {
 
 
 let compiler = webpack(configApi.toConfig());
+let isFistTimeCompile = true;
 
 let {
   port: dfPort,
@@ -44,10 +45,22 @@ function serve(port){
       throw error
     }
 
+    
+
     compiler.hooks.done.tap('done', ()=>{
-      console.log(chalk.cyan('opening the browser at: \n'));
-      printBrowserOpenInfo(parsedUrl);
-      openBrowser(parsedUrl.localUrl)
+
+      if (isFistTimeCompile){
+
+        console.log();
+        console.log(chalk.cyan('opening the browser at: \n'));
+
+        printBrowserOpenInfo(parsedUrl);
+        openBrowser(parsedUrl.localUrl);
+        
+        isFistTimeCompile = false;
+        
+      }
+      
     })
 
   })
