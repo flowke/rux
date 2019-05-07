@@ -5,59 +5,62 @@ const fs = require('fs');
 const configApi = require('../../config/react.config.js');
 const serverConfig = require('../../config/options').devServer;
 const chalk = require('chalk');
-const tools = require('../utils/tools');
-const detectPort = require('../utils/detectPort');
+const openBrowser = require('../dev-utils/openBrowser');
+const {
+  useValidPort,
+  parseUrl
+} = require('../dev-utils/devServerUtils');
+
+function printBrowserOpenInfo(urls) {
+  console.log(
+    `  ${chalk.bold('Local:')}            ${urls.localUrlForTerminal}`
+  );
+  console.log(
+    `  ${chalk.bold('On Your Network:')}  ${urls.lanUrlForTerminal}`
+  );
+
+  console.log();
+  
+
+}
 
 
 let compiler = webpack(configApi.toConfig());
 
-let {port: dfPort} = serverConfig;
+let {
+  port: dfPort,
+  host
+} = serverConfig;
 
-function serve(port = dfPort){
+
+let parsedUrl = parseUrl('http', host, dfPort);
+
+function serve(port){
   const devServer = new WebpackDevServer(compiler, serverConfig);
 
-  devServer.listeningApp.on('error', e=>{
-    if(e.code==='EADDRINUSE'){
-      // console.log('err');
-      devServer.close();
-      console.log(chalk.red(`port: ${port} is listened, use another port`));
-      
-      
-    }else{
-      throw e;
-    }
-    
-  });
   
-
-  devServer.listen(port, '0.0.0.0', err => {
+  devServer.listen(port, host, err => {
     if (err) {
       throw error
     }
 
     compiler.hooks.done.tap('done', ()=>{
-
-      console.log(chalk.cyan('Starting the development server...\n'));
-      
-      tools.openBrowser(`http://localhost:${port}`)
+      console.log(chalk.cyan('opening the browser at: \n'));
+      printBrowserOpenInfo(parsedUrl);
+      openBrowser(parsedUrl.localUrl)
     })
 
   })
 }
 
 function run() {
-  detectPort(dfPort)
+  useValidPort(dfPort, host)
   .then(valiPort=>{
-    console.log(valiPort, 'valiPort');
     serve(valiPort);
-    
-    
-    
   })
   .catch(e=>{
-    console.log(e, '88');
-    
-  })
+    console.log(chalk.cyan('stop launching the dev server.'));
+  });
   
 }
 

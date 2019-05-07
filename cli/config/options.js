@@ -50,6 +50,7 @@ let defaultOptions = {
   devServer: {
     port: 3005,
     quiet: true,
+    host: '0.0.0.0',
   },
   appRoot: process.cwd(),
   paths: paths,
