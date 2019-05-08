@@ -1,15 +1,19 @@
-const paths = require('../../config/paths');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const fs = require('fs');
-const configApi = require('../../config/react.config.js');
-const serverConfig = require('../../config/options').devServer;
+const path = require('path');
 const chalk = require('chalk');
 const openBrowser = require('../dev-utils/openBrowser');
+const createOption = require('../../config/options');
+const {watch, unwatch} = require('../dev-utils/watch');
+
 const {
   useValidPort,
-  parseUrl
+  parseUrl,
+  watchConfigChange
 } = require('../dev-utils/devServerUtils');
+
+
 
 function printBrowserOpenInfo(urls) {
   console.log(
@@ -21,60 +25,108 @@ function printBrowserOpenInfo(urls) {
 
   console.log();
   
-
 }
 
+function createCompiler(webpack, config) {
+  let compiler = webpack(config);
 
-let compiler = webpack(configApi.toConfig());
-let isFistTimeCompile = true;
+  return compiler;
+}
 
-let {
-  port: dfPort,
-  host
-} = serverConfig;
+function serve(validPort, serverConfig, openBrowser=true){
+  const webpackConfig = require('../../config/react.config.js').toConfig();
 
+  let {
+    port: dfPort,
+    host
+  } = serverConfig;
 
-let parsedUrl = parseUrl('http', host, dfPort);
-
-function serve(port){
+  let compiler = createCompiler(webpack, webpackConfig);
   const devServer = new WebpackDevServer(compiler, serverConfig);
 
+  let parsedUrl = parseUrl('http', host, dfPort);
   
-  devServer.listen(port, host, err => {
+  devServer.listen(validPort, host, err => {
     if (err) {
       throw error
     }
-
     
+    // 第一次编译完成
+    let isFistTimeCompile = true;
+    compiler.hooks.done.tap('done', () => {
 
-    compiler.hooks.done.tap('done', ()=>{
-
-      if (isFistTimeCompile){
+      if (isFistTimeCompile && openBrowser) {
 
         console.log();
         console.log(chalk.cyan('opening the browser at: \n'));
 
         printBrowserOpenInfo(parsedUrl);
         openBrowser(parsedUrl.localUrl);
-        
+
         isFistTimeCompile = false;
-        
+
       }
+
+    })
+
+  });
+
+  return devServer;
+}
+
+
+
+function run(openBrowser) {
+
+  let {
+    devServer: {
+      port,
+      host
+    },
+    appRoot,
+  } = options = createOption();
+
+  useValidPort(port, host)
+  .then(valiPort=>{
+
+    let server = serve(valiPort, options.devServer, openBrowser);
+
+    watchConfig(paths=>{
       
+      restart(server);
     })
 
   })
-}
-
-function run() {
-  useValidPort(dfPort, host)
-  .then(valiPort=>{
-    serve(valiPort);
-  })
   .catch(e=>{
     console.log(chalk.cyan('stop launching the dev server.'));
+    throw e;
   });
   
 }
 
-module.exports = run
+function watchConfig(cb=f=>f) {
+  let watcher = watch('configDir', path.join(process.cwd(), 'config'));
+  let timer = null;
+  watcher.once('change', (path)=>{
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      console.log();
+      console.log(chalk.bold.green('cause config file changed, try to restart the server!'));
+      
+      console.log();
+      
+      cb(path);   
+    }, 500);
+  });
+}
+
+function restart(server) {
+  unwatch('configDir');
+  server.close();
+  run(false);
+}
+
+
+module.exports = function() {
+  run();
+};

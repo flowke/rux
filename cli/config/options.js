@@ -4,6 +4,7 @@ const fse = require('fs-extra');
 const path = require('path');
 const paths = require('./paths');
 const envs = require('./env');
+const chalk = require('chalk');
 
 let schema = {
   type: 'object',
@@ -102,7 +103,13 @@ function createOptions(){
   let userOp = getUserOptions();
 
   validator(schema, userOp , err=>{
-    if (err) throw new Error(err.message);
+    
+    if (err) {
+
+      
+      let key = err.params.errors[0].params.additionalProperty;
+      throw new Error(err.message + chalk.bold.red(` property: ${key}`));
+    }
   });
 
   let ruxOp = _.defaultsDeep(userOp, defaultOptions);
@@ -116,4 +123,4 @@ function createOptions(){
   return ruxOp;
 }
 
-module.exports = createOptions();
+module.exports = createOptions;

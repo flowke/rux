@@ -3,7 +3,9 @@ const inquirer = require('inquirer');
 const chalk = require('chalk');
 const localIp = require('./localIp');
 const url = require('url');
+const chokidar = require('chokidar');
 
+// 询问是否使用新端口
 function inquirerPort(port, validPort) {
   return inquirer.prompt([
     {
@@ -27,6 +29,7 @@ function inquirerPort(port, validPort) {
   })
 }
 
+// 得到url, 某些url带格式
 exports.parseUrl = function(protocol, host, port){
   const formatUrl = hostname =>
     url.format({
@@ -61,6 +64,7 @@ exports.parseUrl = function(protocol, host, port){
   }
 }
 
+// 期望得到一个可用的端口
 exports.useValidPort = (port, hostname)=>{
   return detectPort(port, hostname)
   .then(validPort=>{
@@ -73,4 +77,12 @@ exports.useValidPort = (port, hostname)=>{
   .then((port)=>{
     return port;
   });
+}
+
+exports.watchConfigChange = function(paths, callback) {
+  const watcher = chokidar.watch(paths);
+
+  watcher.on('change', callback);
+
+  return watcher;
 }

@@ -9,15 +9,13 @@ const babelConfig = require('./babel.config');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const NyanProgressPlugin = require('nyan-progress-webpack-plugin');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
-const options = require('./options');
+const options = require('./options')();
 
 let {
   clientEnv,
   globalVar,
   paths,
 } = options;
-
-// console.log(options);
 
 
 let isDevMode = clientEnv.NODE_ENV === 'development';
