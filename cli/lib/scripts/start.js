@@ -9,8 +9,7 @@ const {watch, unwatch} = require('../dev-utils/watch');
 
 const {
   useValidPort,
-  parseUrl,
-  watchConfigChange
+  parseUrl
 } = require('../dev-utils/devServerUtils');
 
 
@@ -33,7 +32,7 @@ function createCompiler(webpack, config) {
   return compiler;
 }
 
-function serve(validPort, serverConfig, openBrowser=true){
+function serve(validPort, serverConfig, open=true){
   const webpackConfig = require('../../config/react.config.js').toConfig();
 
   let {
@@ -55,7 +54,7 @@ function serve(validPort, serverConfig, openBrowser=true){
     let isFistTimeCompile = true;
     compiler.hooks.done.tap('done', () => {
 
-      if (isFistTimeCompile && openBrowser) {
+      if (isFistTimeCompile && open) {
 
         console.log();
         console.log(chalk.cyan('opening the browser at: \n'));

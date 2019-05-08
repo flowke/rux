@@ -78,11 +78,3 @@ exports.useValidPort = (port, hostname)=>{
     return port;
   });
 }
-
-exports.watchConfigChange = function(paths, callback) {
-  const watcher = chokidar.watch(paths);
-
-  watcher.on('change', callback);
-
-  return watcher;
-}
