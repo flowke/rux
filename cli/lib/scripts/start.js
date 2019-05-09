@@ -14,6 +14,7 @@ const {
 
 
 
+
 function printBrowserOpenInfo(urls) {
   console.log(
     `  ${chalk.bold('Local:')}            ${urls.localUrlForTerminal}`
@@ -85,20 +86,16 @@ function run(openBrowser) {
     appRoot,
   } = options = createOption();
 
-  useValidPort(port, host)
-  .then(valiPort=>{
-
-    let server = serve(valiPort, options.devServer, openBrowser);
-
-    watchConfig(paths=>{
-      
-      restart(server);
-    })
-
-  })
+  return useValidPort(port, host)
+  .then(valiPort => serve(valiPort, options.devServer, openBrowser))
   .catch(e=>{
+    
     console.log(chalk.cyan('stop launching the dev server.'));
-    throw e;
+    console.log('because:\n');
+    console.log(e);
+    
+    
+    process.exit(0);
   });
   
 }
@@ -106,12 +103,13 @@ function run(openBrowser) {
 function watchConfig(cb=f=>f) {
   let watcher = watch('configDir', path.join(process.cwd(), 'config'));
   let timer = null;
-  watcher.once('change', (path)=>{
+  watcher.on('change', (path)=>{
+    
     clearTimeout(timer);
     timer = setTimeout(() => {
+      
       console.log();
       console.log(chalk.bold.green('cause config file changed, try to restart the server!'));
-      
       console.log();
       
       cb(path);   
@@ -119,13 +117,40 @@ function watchConfig(cb=f=>f) {
   });
 }
 
-function restart(server) {
-  unwatch('configDir');
-  server.close();
-  run(false);
+function restart() {
+  return run(false)
 }
 
 
 module.exports = function() {
-  run();
+
+  process.on('warning', m=>{
+    console.log();
+    console.log(chalk.yellow('warning on process:'));
+    console.log();
+    console.log(chalk.yellow.bold(m.message));
+  })
+
+  // the server
+  let server = null;
+
+  run(true)
+  .then(s=>{
+    server = s;
+  });
+
+  watchConfig(path=>{
+    
+    if(!server) return;
+    server.close();
+    
+    process.nextTick(()=>{
+      restart()
+      .then(s => {
+        server = s;
+      })
+    });
+
+  });
+
 };

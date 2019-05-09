@@ -22,6 +22,5 @@ exports.unwatch = function unwatch(key) {
   if (watchers[key]) {
     watchers[key].close();
     watchers[key] = null;
-    // console.log(watchers);
   }
 }
