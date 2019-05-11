@@ -109,7 +109,7 @@ function watchConfig(cb=f=>f) {
     timer = setTimeout(() => {
       
       console.log();
-      console.log(chalk.bold.green('cause config file changed, try to restart the server!'));
+      console.log(chalk.bold.green('cause config file changed, try to restart the server...'));
       console.log();
       
       cb(path);   
@@ -143,7 +143,7 @@ module.exports = function() {
     
     if(!server) return;
     server.close();
-    
+
     process.nextTick(()=>{
       restart()
       .then(s => {
@@ -154,3 +154,6 @@ module.exports = function() {
   });
 
 };
+
+// todo
+// - APP_ROOT
