@@ -53,8 +53,9 @@ let defaultOptions = {
     quiet: true,
     host: '0.0.0.0',
   },
-  appRoot: process.cwd(),
+  appRoot: process.env.APP_ROOT ? path.resolve(process.cwd(), process.env.APP_ROOT) : process.cwd(),
   paths: paths,
+  // 定义客户端环境f
   clientEnv: envs.row,
   // 定义全局变量
   globalVar: {},
@@ -102,11 +103,12 @@ function createOptions(){
   
   let userOp = getUserOptions();
 
+  userOp.appRoot = undefined;
+
   validator(schema, userOp , err=>{
     
     if (err) {
 
-      
       let key = err.params.errors[0].params.additionalProperty;
       throw new Error(err.message + chalk.bold.red(` property: ${key}`));
     }

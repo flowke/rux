@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 const yargs = require('yargs');
 
-yargs 
-  .command('start', 'start devserver', {}, argv=>{
+yargs
+  .command('start', 'start devserver', {}, argv => {
     process.env.NODE_ENV = "development"
-    require('../cli/lib/scripts/start.js')('react')
+    require('../cli/lib/scripts/start.js')('vue')
   })
   .help()
 
