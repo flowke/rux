@@ -3,6 +3,9 @@ const path = require('path');
 module.exports = function () {
   return {
     cwd: path.resolve(__dirname, '../../'),
+    presets: [
+      "@babel/preset-env"
+    ],
     // presets: [
     //   "@babel/preset-env",
     //   "@babel/preset-react",

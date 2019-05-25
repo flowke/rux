@@ -87,11 +87,16 @@ cfg.merge({
           },
           // name: babel
           // only handle app src js
-          babel: {
-            test: /\.(js|mjs|jsx|ts|tsx)$/,
+          js: {
+            test: /\.(js)$/,
             include: [paths.appSrc],
-            loader: require.resolve('babel-loader'),
-            options: babelConfig(),
+            use: {
+              'babel':{
+                loader: require.resolve('babel-loader'),
+                options: babelConfig(),
+              }
+            },
+            
           },
           // name: css
           css: {

@@ -1,23 +1,18 @@
-const config = require('./config.js');
-
+const config = require('./config');
+const merge = require('../../internal/mergeDeep');
 
 config.module
   .rule('baseLoaders')
-  .oneOf('babel')
-    // .tap(op=>{
-    //   return {}
-    // })
+  .oneOf('js')
+  .use('babel')
+  .tap(op=>{
+    return merge(op, {
+      presets: [
+        "@babel/preset-react"
+      ]
+    })
 
-
-console.log(
-  config.module
-    .rule('baseLoaders')
-    .oneOf('babel')
-    .get('options')
-      
-
-  );
-
+  })
 
 
 module.exports = config;
