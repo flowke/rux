@@ -125,6 +125,7 @@ module.exports = class Server {
 
         console.log();
         console.log(chalk.bold.green('cause config file changed, try to restart the server...'));
+        console.log(chalk.bold.green('  file: '+ path));
         console.log();
 
         cb(path);
@@ -135,7 +136,7 @@ module.exports = class Server {
 
   restart() {
     this.configOptions = createOption();
-    return run(false)
+    return this.run(false)
   }
 
   start() {
@@ -150,11 +151,11 @@ module.exports = class Server {
     this.run(true);
 
     this.watchConfig(path => {
-
-      if (!this.server) return;
-      this.server.close();
-      this.server = null;
-      process.nextTick(this.restart);
+      
+      if (!this.devServer) return;
+      this.devServer.close();
+      this.devServer = null;
+      process.nextTick(()=>this.restart());
 
     });
   }

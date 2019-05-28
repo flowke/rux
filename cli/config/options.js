@@ -8,7 +8,7 @@ const chalk = require('chalk');
 
 let schema = {
   type: 'object',
-  "additionalProperties": false,
+  // "additionalProperties": false,
   errorMessage: {
     type: 'config must be a object.',
     additionalProperties: 'config can not contain additional properties.'
@@ -52,6 +52,7 @@ let defaultOptions = {
     port: 3005,
     quiet: true,
     host: '0.0.0.0',
+    hot: true,
   },
   appRoot: process.env.APP_ROOT ? path.resolve(process.cwd(), process.env.APP_ROOT) : process.cwd(),
   paths: paths,

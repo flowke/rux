@@ -60,6 +60,7 @@ cfg.merge({
   entry: {
     app: [paths.entryPoint]
   },
+  target: options.target,
   output: {
     path: paths.outputPath,
     publicPath: paths.publicPath,
@@ -75,6 +76,7 @@ cfg.merge({
     rule: {
       // name: baseLoader
       baseLoaders: {
+        
         oneOf: {
           // name: image, 
           image: {
@@ -126,7 +128,7 @@ cfg.merge({
               },
               {
                 sassLoader: {
-                  loader: 'sass-loader'
+                  loader: require.resolve('sass-loader')
                 }
               }
             ),
@@ -142,7 +144,7 @@ cfg.merge({
               },
               {
                 sassLoader: {
-                  loader: 'sass-loader'
+                  loader: require.resolve('sass-loader')
                 }
               }
             ),
@@ -158,7 +160,7 @@ cfg.merge({
               },
               {
                 lessLoader: {
-                  loader: 'less-loader'
+                  loader: require.resolve('less-loader')
                 }
               }
             ),
@@ -174,7 +176,7 @@ cfg.merge({
               },
               {
                 lessLoader: {
-                  loader: 'less-loader'
+                  loader: require.resolve('less-loader')
                 }
               }
             ),
