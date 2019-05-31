@@ -1,12 +1,34 @@
-const Server = require('../lib/server')
+const createOption = require('../config/options');
+const { watch, unwatch } = require('./dev-utils/watch');
+var process = require('process');
+var cp = require('child_process');
+const chalk = require('chalk');
 
 module.exports = function(target) {
-  let config;
-  if (target === 'vue') config = require('../config/vue.config.js').toConfig();
-  if (target === 'react') config = require('../config/react.config.js').toConfig();
-  new Server(config).start();
+  
+  watchConfig(path => {
 
+    
+
+  });
 };
 
-// todo
-// - APP_ROOT
+
+function watchConfig(cb = f => f) {
+  let { appRoot } = createOption();
+  let watcher = watch('configDir', path.join(appRoot, 'config'));
+  let timer = null;
+  watcher.on('change', (path) => {
+    // debounce
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+
+      console.log();
+      console.log(chalk.bold.green('cause config file changed, try to restart the server...'));
+      console.log(chalk.bold.green('  file: ' + path));
+      console.log();
+
+      cb(path);
+    }, 500);
+  });
+}

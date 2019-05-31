@@ -52,7 +52,7 @@ let defaultOptions = {
     port: 3005,
     quiet: true,
     host: '0.0.0.0',
-    hot: true,
+    // hot: true,
   },
   appRoot: process.env.APP_ROOT ? path.resolve(process.cwd(), process.env.APP_ROOT) : process.cwd(),
   paths: paths,
@@ -95,7 +95,7 @@ function handleGlobalVar(vars) {
   let out = {};
   for (const name in vars) {
     if (vars.hasOwnProperty(name)) {
-      out['RUX_'+name] = vars[name];
+      out['THA_'+name] = vars[name];
     }
   }
   return out;
@@ -114,17 +114,17 @@ function createOptions(){
     }
   });
 
-  let ruxOp = _.defaultsDeep(userOp, defaultOptions);
-  validator(schema, ruxOp);
+  let thaOp = _.defaultsDeep(userOp, defaultOptions);
+  validator(schema, thaOp);
 
-  ruxOp.paths = handlePaths(ruxOp.appRoot, ruxOp.paths);
-  ruxOp.globalVar = handleGlobalVar(ruxOp.globalVar);
+  thaOp.paths = handlePaths(thaOp.appRoot, thaOp.paths);
+  thaOp.globalVar = handleGlobalVar(thaOp.globalVar);
 
-  validator(schema, ruxOp);
+  validator(schema, thaOp);
 
   
   
-  return ruxOp;
+  return thaOp;
 }
 
 createOptions.inject = function (op) {

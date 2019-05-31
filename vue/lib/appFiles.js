@@ -1,13 +1,22 @@
 const glob = require('globby');
 const path = require('path');
+const fse = require('fs-extra');
 
-module.exports = function(root) {
+
+module.exports = function(src) {
+
+
+  function mayPath(p = '') {
+    p = path.resolve(src, p);
+    return fse.existsSync(p)? p: '';
+  }
   
   let services = glob.sync('services/*.js', {
-    cwd: path.join(root),
+    cwd: path.join(src),
     onlyFiles: true,
     deep: 0
   });
+  
   
 
   return {
@@ -27,6 +36,10 @@ module.exports = function(root) {
       apis: []
     }),
 
+    app: mayPath('app.js'),
+    router: mayPath('router/index.js'),
+    util: mayPath('utils/util.js'),
+    
   }
 
 }

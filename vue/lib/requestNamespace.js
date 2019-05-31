@@ -6,15 +6,15 @@ module.exports = function(namespace) {
     pathNamespace: '$apis',
     moduleNamespace: '$r',
   }
-
+  
   if (type(namespace, 'object')) {
     namespace = Object.assign(df, namespace)
   } else if (type(namespace, 'array')) {
-    namespace = Object.assign({
-      requestName: namespace[0],
-      pathNamespace: namespace[1],
-      moduleNamespace: namespace[2],
-    }, dfRequest)
+    namespace = {
+      requestName: namespace[0] || df.requestName,
+      pathNamespace: namespace[1] || df.pathNamespace,
+      moduleNamespace: namespace[2] || df.moduleNamespace,
+    }
   } else {
     namespace = df
   }

@@ -2,6 +2,9 @@
 const path = require('path');
 require('@babel/register', {
   cwd: path.resolve(__dirname, '../'),
+  ignore: [
+    /node_modules/,
+  ],
   presets: [
     
     ['@babel/preset-env', {

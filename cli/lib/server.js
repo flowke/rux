@@ -62,6 +62,9 @@ module.exports = class Server {
       let isFistTimeCompile = true;
       compiler.hooks.done.tap('done', () => {
 
+        console.log('done');
+        
+
         if (isFistTimeCompile && open) {
 
           console.log();
@@ -136,6 +139,8 @@ module.exports = class Server {
 
   restart() {
     this.configOptions = createOption();
+    console.log(this.configOptions.paths);
+    
     return this.run(false)
   }
 
@@ -150,14 +155,15 @@ module.exports = class Server {
 
     this.run(true);
 
-    this.watchConfig(path => {
+    // this.watchConfig(path => {
       
-      if (!this.devServer) return;
-      this.devServer.close();
-      this.devServer = null;
-      process.nextTick(()=>this.restart());
+    //   // if (!this.devServer) return;
+    //   this.devServer.close();
+    //   this.devServer = null;
+    //   // process.nextTick(()=>);
+    //   this.restart()
 
-    });
+    // });
   }
 
 }

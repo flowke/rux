@@ -1,21 +1,14 @@
 #!/usr/bin/env node
-const path = require('path');
-require('@babel/register',{
+const path = require('path')
+
+require('@babel/register')( {
   cwd: path.resolve(__dirname, '../'),
   ignore: [
     /node_modules/,
     path.resolve(__dirname, '../cli')
   ],
-  presets: [
-    ['@babel/preset-env',{
-      target: {
-        node: 'current'
-      },
-      useBuiltIns: false
-    }]
-  ]
+  plugins: ['@babel/plugin-transform-modules-commonjs']
 })
-
 
 const yargs = require('yargs');
 
@@ -31,3 +24,4 @@ yargs
   .help()
 
 yargs.argv;
+

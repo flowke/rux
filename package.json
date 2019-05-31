@@ -1,26 +1,26 @@
 {
-  "name": "rux",
-  "version": "1.0.0",
-  "description": "rux",
+  "name": "tha",
+  "version": "0.0.1",
+  "description": "tha",
   "main": "index.js",
   "bin": {
-    "rux-react": "./bin/rux-react.js",
-    "rux-vue": "./bin/rux-vue.js"
+    "tha-r": "./bin/tha-react.js",
+    "tha-v": "./bin/tha-vue.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/flowke/rux.git"
+    "url": "git+https://github.com/flowke/tha.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/flowke/rux/issues"
+    "url": "https://github.com/flowke/tha/issues"
   },
-  "homepage": "https://github.com/flowke/rux#readme",
+  "homepage": "https://github.com/flowke/tha#readme",
   "dependencies": {
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
@@ -31,6 +31,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.2.0",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/plugin-syntax-jsx": "^7.2.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.4.4",
     "@babel/plugin-transform-runtime": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
     "@babel/register": "^7.4.4",
@@ -62,7 +63,7 @@
     "node-sass": "^4.12.0",
     "nyan-progress-webpack-plugin": "^1.2.0",
     "pnp-webpack-plugin": "^1.4.3",
-    "puta": "0.0.6",
+    "puta": "0.0.8",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
     "url-loader": "^1.1.2",

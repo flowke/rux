@@ -6,7 +6,8 @@ const getAppFiles = require('../lib/appFiles');
 const fse = require('fs-extra');
 const start = require('../../cli/scripts/start');
 const path = require('path');
-const watchFile = require('../lib/watchFile')
+const watchFile = require('../lib/watchFile');
+const assert = require('assert').strict;
 
 createOption.inject({
   paths: {
@@ -14,17 +15,19 @@ createOption.inject({
   }
 });
 
+
+
 function create() {
 
   let {
     request = true,
     router,
-    appRoot,
     paths: optionsPaths
   } = createOption();
 
+  let { appSrc } = optionsPaths;
 
-  let appFiles = getAppFiles(optionsPaths.appSrc)
+  let appFiles = getAppFiles(appSrc)
 
   let importTpl = '';
   let vueTpl = '';
@@ -32,7 +35,7 @@ function create() {
   let reqTpl = '';
   let initTpl = '';
 
-
+  let vueOptions = '';
 
   // vue
   importTpl += `import Vue from 'vue/dist/vue.runtime.esm'\n`
@@ -43,51 +46,58 @@ function create() {
     routerTpl +=
       `Vue.use(Router)\n`;
 
-    // if(){}
+    if(appFiles.router){
+      importTpl += `import routerOption from '@/router/index'\n`
+      routerTpl += `let router = new Router(routerOption)`
+      vueOptions+='router,\n'
+    }
   }
-
-
 
   vueTpl +=
     `let vm = new Vue({
       el: '#root',
+      ${vueOptions}
       render: h=>{
         return <div>我在这里</div>
       }
     })
     \n`;
 
+  let context = {
+    appExportDefault: null
+  }
+
   // requset
   if (request) {
-
-    let reqConfig = {
-      namespace: parseNamespace({}),
-    };
+    context.namespace = parseNamespace({});
 
     let optionCode = '';
     if (appFiles.services.config) {
-      let config = require(path.join(optionsPaths.appSrc, appFiles.services.config));
-      reqConfig.namespace = parseNamespace(config.namespace);
+      delete require.cache[path.resolve(appSrc, appFiles.services.config)];
+      let config = require(path.resolve(appSrc, appFiles.services.config) );
 
-      importTpl += `import * as serviceCfg from '@/services/config';\n`;
-      optionCode = `serviceCfg.options`
-    } else {
+      context.namespace = parseNamespace(config.namespace);
+      
+      
+      // 如果导出了options
+      if(config.options){
+        importTpl += `import * as serviceCfg from '@/services/config';\n`;
+        optionCode = `serviceCfg.options`
+      }
 
     }
 
     reqTpl +=
       `let req = new Request(${optionCode});
 
-      window.${reqConfig.namespace.requestName} = req;
-      window.${reqConfig.namespace.pathNamespace} = req.apis;
-      window.${reqConfig.namespace.moduleNamespace} = req.mApis;\n`;
+      window.${context.namespace.requestName} = req;
+      window.${context.namespace.pathNamespace} = req.apis;
+      window.${context.namespace.moduleNamespace} = req.mApis;\n`;
 
     appFiles.services.apis.forEach(file => {
       importTpl += `import __${file.name} from '@/${file.path}';\n`;
       reqTpl += `req.moduleRegister(__${file.name}, '${file.name}');\n`;
     })
-
-
 
     importTpl +=
       `import Request from 'puta';\n`
@@ -95,43 +105,60 @@ function create() {
 
 
   // utils
-  if (fse.existsSync(path.resolve(optionsPaths.appSrc, 'utils/util.js'))) {
+  if (appFiles.util) {
     importTpl += `import * as util from '@/utils/util';\n`
     initTpl += `window.$util = util\n`
   }
 
   // app init
-  if (fse.existsSync(path.resolve(optionsPaths.appSrc, 'app.js'))) {
-    let fn = require(path.resolve(optionsPaths.appSrc, 'app.js'))
+  if (appFiles.app) {
+    delete require.cache[path.resolve(appSrc, 'app.js')];
+    let fn = require(path.resolve(appSrc, 'app.js'))
     importTpl += `import app from '@/app';\n`
-
+    context.appExportDefault = fn.default;
     if(type(fn.default, 'function')){
-      initTpl += `app(vm);\n`
+      initTpl += `app(vm, Vue);\n`
     }
-    
     
   }
 
-  return importTpl + vueTpl + routerTpl + reqTpl + initTpl;
+  return {
+    code: importTpl + vueTpl + routerTpl + reqTpl + initTpl,
+    serviceNamespace: context.namespace,
+    appExportDefault: context.appExportDefault
+  } 
 }
 
 let started = false;
 
-function emitFile() {
-  fse.outputFile(path.resolve(__dirname, '.entry.js'), create(), err => {
+function emitFile(code) {
+  fse.outputFile(path.resolve(__dirname, '.entry.js'), code, err => {
     if(!started) start('vue');
     started = true;
   })
 }
 
-emitFile();
+let prevContext = create();
+
+emitFile(prevContext.code);
 
 // debounce
 let timer = null
-watchFile(createOption().appRoot, ()=>{
+watchFile(createOption().appRoot, (emitPath)=>{
   clearTimeout(timer);
   timer = setTimeout(() => {
-    emitFile();
+    let {
+      code,
+      context
+    } = create();
+
+    // if (emitPath.serviceNamespace && _.isEqual(context.serviceNamespace, prevContext.namespace)){
+    //   return ;
+    // }
+    
+    emitFile(code);
+    prevContext = context
+    
   }, 500);
   
 })
