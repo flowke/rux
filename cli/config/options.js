@@ -62,10 +62,10 @@ let defaultOptions = {
   globalVar: {},
 }
 
-function getUserOptions() {
+function getUserOptions(root='./') {
   let options = {};
 
-  let configPath = path.resolve('./config/config.js');
+  let configPath = path.resolve(root, 'config/config.js');
 
   if (fse.existsSync(configPath)) {
     options = require(configPath);
@@ -83,6 +83,7 @@ function handlePaths(cwd, paths={}) {
 
   for (const name in paths) {
     if (paths.hasOwnProperty(name) && !path.isAbsolute(paths[name]) && !filter.some(e => e === name) ) {
+      
       paths[name] = path.resolve(cwd, paths[name]);
     }
   }
@@ -102,9 +103,7 @@ function handleGlobalVar(vars) {
 
 function createOptions(){
   
-  let userOp = getUserOptions();
-
-  userOp.appRoot = undefined;
+  let userOp = getUserOptions(defaultOptions.appRoot);
 
   validator(schema, userOp , err=>{
     
@@ -122,8 +121,15 @@ function createOptions(){
   ruxOp.globalVar = handleGlobalVar(ruxOp.globalVar);
 
   validator(schema, ruxOp);
+
+  
   
   return ruxOp;
+}
+
+createOptions.inject = function (op) {
+  defaultOptions = _.defaultsDeep({},op, defaultOptions)
+  
 }
 
 module.exports = createOptions;

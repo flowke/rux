@@ -72,6 +72,12 @@ cfg.merge({
       : '[name].chunk.js',
   },
 
+  resolve: {
+    alias: {
+      '@': path.resolve(options.appRoot, 'src')
+    }
+  },
+
   module: {
     rule: {
       // name: baseLoader

@@ -1,11 +1,23 @@
 const config = require('./config.js');
 const merge = require('../../internal/mergeDeep');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const options = require('./options');
+const path = require('path');
 
 
 config.module
+  .rule('handleRouter')
+    .pre()
+    .test(path.resolve(options().appRoot, 'router/index.js'))
+    .use('router')
+      .loader(require.resolve('./loader/vue-router-loader.js'))
+      .end()
+    .end()
   .rule('baseLoaders')
     .oneOf('js')
+      .include
+        .add(/\.entry\.js$/)
+        .end()
       .use('babel')
         .tap(op => {
           return merge(op, {

@@ -2,6 +2,7 @@ const path = require('path');
 
 module.exports = function (cfg={}) {
 
+  console.log(path.resolve(__dirname, '../../'));
   
   return {
     cwd: path.resolve(__dirname, '../../'),
