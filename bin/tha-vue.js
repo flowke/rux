@@ -5,7 +5,7 @@ require('@babel/register')( {
   cwd: path.resolve(__dirname, '../'),
   ignore: [
     /node_modules/,
-    path.resolve(__dirname, '../cli')
+    /tha/
   ],
   plugins: ['@babel/plugin-transform-modules-commonjs']
 })
