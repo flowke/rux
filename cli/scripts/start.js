@@ -1,25 +1,65 @@
 const createOption = require('../config/options');
-const { watch, unwatch } = require('./dev-utils/watch');
-var process = require('process');
-var cp = require('child_process');
+const { watch, unwatch } = require('../lib/dev-utils/watch');
+const process = require('process');
+const cp = require('child_process');
 const chalk = require('chalk');
+const path = require('path');
+const type = require('../../utils/type');
+const openBrowser = require('../lib/dev-utils/openBrowser');
+
+
 
 module.exports = function(target) {
+  let runServer = path.resolve(__dirname, `${target}ServerStart.js`);
+  let server = cp.fork(runServer);
+
+  let isFirstTimeOpen = true;
+
+  server.on('message', m=>{
+
+    if ((type(m, 'object') || m.msg === 'buildDone') && isFirstTimeOpen){
+      isFirstTimeOpen = false;
+      let parsedUrl = m.data;
+
+      printBrowserOpenInfo(parsedUrl);
+      openBrowser(parsedUrl.localUrl)
+    }
+  })
   
   watchConfig(path => {
+    server.kill();
+    server = cp.fork(runServer)
+  });
 
-    
+  process.on('SIGINT', function () {
+    server.kill();
+    process.exit();
+
 
   });
 };
 
+
+function printBrowserOpenInfo(urls) {
+  console.log();
+  console.log(chalk.cyan('opening the browser at:'));
+  console.log();
+  console.log(
+    `  ${chalk.bold('Local:')}            ${urls.localUrlForTerminal}`
+  );
+  console.log(
+    `  ${chalk.bold('On Your Network:')}  ${urls.lanUrlForTerminal}`
+  );
+
+  console.log();
+
+}
 
 function watchConfig(cb = f => f) {
   let { appRoot } = createOption();
   let watcher = watch('configDir', path.join(appRoot, 'config'));
   let timer = null;
   watcher.on('change', (path) => {
-    // debounce
     clearTimeout(timer);
     timer = setTimeout(() => {
 

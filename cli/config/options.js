@@ -52,7 +52,7 @@ let defaultOptions = {
     port: 3005,
     quiet: true,
     host: '0.0.0.0',
-    // hot: true,
+    hot: true,
   },
   appRoot: process.env.APP_ROOT ? path.resolve(process.cwd(), process.env.APP_ROOT) : process.cwd(),
   paths: paths,

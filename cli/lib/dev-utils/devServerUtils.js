@@ -55,8 +55,6 @@ exports.parseUrl = function(protocol, host, port){
     prettyHost = host;
   }
 
-  
-
   return {
     lanUrlForTerminal: prettyPrintUrl(localIp()),
     localUrlForTerminal: prettyPrintUrl(prettyHost),

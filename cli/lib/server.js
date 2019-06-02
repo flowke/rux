@@ -1,35 +1,28 @@
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-const fs = require('fs');
-const path = require('path');
 const chalk = require('chalk');
-const openBrowser = require('./dev-utils/openBrowser');
-const createOption = require('../config/options');
-const { watch, unwatch } = require('./dev-utils/watch');
+
+const {
+  SyncHook
+} = require("tapable"); 
 
 const {
   useValidPort,
   parseUrl
 } = require('./dev-utils/devServerUtils');
 
-function printBrowserOpenInfo(urls) {
-  console.log(
-    `  ${chalk.bold('Local:')}            ${urls.localUrlForTerminal}`
-  );
-  console.log(
-    `  ${chalk.bold('On Your Network:')}  ${urls.lanUrlForTerminal}`
-  );
-
-  console.log();
-
-}
-
 module.exports = class Server {
-  constructor(webpackConfig) {
+  constructor(webpackConfig, devOption) {
     this.validPort = null;
     this.devServer = null;
     this.webpackConfig = webpackConfig;
-    this.configOptions = createOption();
+    this.devOption = devOption;
+
+    this.hooks = {
+      buildDone: new SyncHook(['parsedUrl']),
+      listened: new SyncHook()
+    }
+    
   }
 
   createCompiler(webpack, config) {
@@ -38,7 +31,7 @@ module.exports = class Server {
     return compiler;
   }
 
-  serve(validPort, serverConfig, open = true) {
+  serve(validPort, serverConfig) {
 
     let {
       port: dfPort,
@@ -58,43 +51,21 @@ module.exports = class Server {
       this.devServer = devServer;
       this.validPort = validPort;
 
-      // 第一次编译完成
-      let isFistTimeCompile = true;
       compiler.hooks.done.tap('done', () => {
-
-        console.log('done');
-        
-
-        if (isFistTimeCompile && open) {
-
-          console.log();
-          console.log(chalk.cyan('opening the browser at: \n'));
-
-          printBrowserOpenInfo(parsedUrl);
-          openBrowser(parsedUrl.localUrl);
-
-          isFistTimeCompile = false;
-
-        }
-
+        this.hooks.buildDone.call(parsedUrl);
       })
 
     });
 
-
-
     return devServer;
   }
 
-  run(openBrowser) {
+  run() {
 
     let {
-      devServer,
-      devServer: {
-        port,
-        host
-      }
-    } = this.configOptions;
+      port,
+      host
+    } = this.devOption;
 
     let p = null;
 
@@ -105,7 +76,7 @@ module.exports = class Server {
     }
 
     return p
-      .then(valiPort => this.serve(valiPort, devServer, openBrowser))
+      .then(valiPort => this.serve(valiPort, this.devOption))
       .catch(e => {
 
         console.log(chalk.cyan('stop launching the dev server.'));
@@ -115,33 +86,6 @@ module.exports = class Server {
         process.exit(0);
       })
 
-  }
-
-  watchConfig(cb = f => f) {
-    let { appRoot } = this.configOptions;
-    let watcher = watch('configDir', path.join(appRoot, 'config'));
-    let timer = null;
-    watcher.on('change', (path) => {
-      // debounce
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-
-        console.log();
-        console.log(chalk.bold.green('cause config file changed, try to restart the server...'));
-        console.log(chalk.bold.green('  file: '+ path));
-        console.log();
-
-        cb(path);
-      }, 500);
-    });
-  }
-
-
-  restart() {
-    this.configOptions = createOption();
-    console.log(this.configOptions.paths);
-    
-    return this.run(false)
   }
 
   start() {
@@ -154,16 +98,7 @@ module.exports = class Server {
     })
 
     this.run(true);
-
-    // this.watchConfig(path => {
-      
-    //   // if (!this.devServer) return;
-    //   this.devServer.close();
-    //   this.devServer = null;
-    //   // process.nextTick(()=>);
-    //   this.restart()
-
-    // });
+    
   }
 
 }
