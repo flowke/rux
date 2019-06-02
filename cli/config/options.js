@@ -5,6 +5,7 @@ const path = require('path');
 const paths = require('./paths');
 const envs = require('./env');
 const chalk = require('chalk');
+const debounce = require('../../utils/debounce');
 
 let schema = {
   type: 'object',
@@ -62,6 +63,8 @@ let defaultOptions = {
   globalVar: {},
 }
 
+let cacheOptions = null;
+
 function getUserOptions(root='./') {
   let options = {};
 
@@ -102,6 +105,9 @@ function handleGlobalVar(vars) {
 }
 
 function createOptions(){
+
+  if (cacheOptions)
+  cacheOptions
   
   let userOp = getUserOptions(defaultOptions.appRoot);
 
@@ -127,9 +133,10 @@ function createOptions(){
   return thaOp;
 }
 
-createOptions.inject = function (op) {
-  defaultOptions = _.defaultsDeep({},op, defaultOptions)
-  
+let create = debounce.cache(1000, createOptions);
+
+create.inject = function (op) {
+  defaultOptions = _.defaultsDeep({}, op, defaultOptions)
 }
 
-module.exports = createOptions;
+module.exports = create;
