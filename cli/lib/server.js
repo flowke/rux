@@ -22,7 +22,6 @@ module.exports = class Server {
       buildDone: new SyncHook(['parsedUrl']),
       listened: new SyncHook()
     }
-    
   }
 
   createCompiler(webpack, config) {

@@ -1,10 +1,9 @@
 import Vue from 'vue/dist/vue.runtime.esm'
-import Router from 'vue-router'
-import routerOption from '@/router/index'
 import __menu from '@/services/menu.js';
 import Request from 'puta';
 import * as util from '@/utils/util';
-import app from '@/app';
+import Router from 'vue-router'
+import routerOption from '@/router/index'
 Vue.use(Router)
 let router = new Router(routerOption)
 let vm = new Vue({
@@ -12,7 +11,7 @@ let vm = new Vue({
   router,
 
   render: h=>{
-    return <div>我在这里</div>
+    return <router-view></router-view>
   }
 })
 let req = new Request();
@@ -22,4 +21,3 @@ window.$apis = req.apis;
 window.$r = req.mApis;
 req.moduleRegister(__menu, 'menu');
 window.$util = util
-app(vm, Vue);

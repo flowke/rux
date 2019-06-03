@@ -6,7 +6,9 @@ const chalk = require('chalk');
 const path = require('path');
 const type = require('../../utils/type');
 const openBrowser = require('../lib/dev-utils/openBrowser');
-
+const {
+  SyncHook
+} = require("tapable");
 
 
 module.exports = function(target) {
@@ -15,9 +17,14 @@ module.exports = function(target) {
 
   let isFirstTimeOpen = true;
 
+  let hooks = {
+    restart: new SyncHook()
+  }
+
   server.on('message', m=>{
 
     if ((type(m, 'object') || m.msg === 'buildDone') && isFirstTimeOpen){
+
       isFirstTimeOpen = false;
       let parsedUrl = m.data;
 
@@ -27,6 +34,8 @@ module.exports = function(target) {
   })
   
   watchConfig(path => {
+
+    hooks.restart.call();
     server.kill();
     server = cp.fork(runServer)
   });
@@ -37,6 +46,11 @@ module.exports = function(target) {
 
 
   });
+
+  return {
+    hooks
+  }
+
 };
 
 

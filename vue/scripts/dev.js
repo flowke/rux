@@ -5,40 +5,50 @@ const start = require('../../cli/scripts/start');
 const path = require('path');
 const watchFile = require('../lib/watchFile');
 const create = require('../lib/createEntry');
+const debounce = require('../../utils/debounce')
 
 let started = false;
 
-function emitFile(code) {
+function emitFile(code, cb) {
   fse.outputFile(path.resolve(__dirname,'../../', '.entry.js'), code, err => {
-    if(!started) start('vue');
-    started = true;
+    if(err) throw err;
+
+    cb && cb()
+
   })
 }
 
 let prevContext = create();
 
-emitFile(prevContext.code);
+emitFile(prevContext.code, ()=>{
+  if (!started) {
+    let startContext = start('vue');
+    startContext.hooks.restart.tap('restart', () => {
 
-// debounce
-let timer = null
-watchFile(createOption().appRoot, (emitPath)=>{
-  clearTimeout(timer);
-  timer = setTimeout(() => {
-    let {
-      code,
-      context
-    } = create();
+      console.log('restart, dev');
+      
+      emitFile(create().code)
+    })
+  }
+  started = true;
+});
 
-    // if (emitPath.serviceNamespace && _.isEqual(context.serviceNamespace, prevContext.namespace)){
-    //   return ;
-    // }
-    
-    emitFile(code);
-    prevContext = context
-    
-  }, 500);
-  
-})
+
+
+watchFile(createOption().appRoot, debounce.exec(500, (emitPath) => {
+  let {
+    code,
+    context
+  } = create();
+
+  // if (emitPath.serviceNamespace && _.isEqual(context.serviceNamespace, prevContext.namespace)){
+  //   return ;
+  // }
+
+  emitFile(code);
+  prevContext = context
+
+}) )
 
 
 

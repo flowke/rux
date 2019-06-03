@@ -8,7 +8,8 @@ let appFn = null;
 module.exports = function (cwd,cb=f=>f) {
   
   let watcher = chokidar.watch([
-    'src/app.js',
+    'src/init.js',
+    'src/App.vue',
     'src/index.html',
     'src/services/*',
     'src/utils/util.js',
@@ -24,7 +25,7 @@ module.exports = function (cwd,cb=f=>f) {
 
   chokidar.watch([
     'src/services/config.js',
-    'src/app.js',
+    'src/init.js',
   ], {
       cwd
   })

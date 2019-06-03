@@ -36,9 +36,10 @@ module.exports = function(src) {
       apis: []
     }),
 
-    app: mayPath('app.js'),
+    init: mayPath('init.js'),
     router: mayPath('router/index.js'),
     util: mayPath('utils/util.js'),
+    App: mayPath('App.vue'),
     
   }
 

@@ -55,7 +55,7 @@ let defaultOptions = {
     host: '0.0.0.0',
     hot: true,
   },
-  appRoot: process.env.APP_ROOT ? path.resolve(process.cwd(), process.env.APP_ROOT) : process.cwd(),
+  appRoot: process.env.APP_ROOT ? path.resolve(process.cwd(),process.env.APP_ROOT) : process.cwd(),
   paths: paths,
   // 定义客户端环境f
   clientEnv: envs.row,
@@ -128,7 +128,6 @@ function createOptions(){
 
   validator(schema, thaOp);
 
-  
   
   return thaOp;
 }

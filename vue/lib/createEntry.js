@@ -11,6 +11,9 @@ module.exports = function create() {
     paths: optionsPaths
   } = createOption();
 
+  console.log(router, 'router');
+  
+
   let { appSrc } = optionsPaths;
 
   let appFiles = getAppFiles(appSrc)
@@ -20,33 +23,23 @@ module.exports = function create() {
   let routerTpl = '';
   let reqTpl = '';
   let initTpl = '';
+  let appTpl = '';
 
-  let vueOptions = '';
+  
 
   // vue
   importTpl += `import Vue from 'vue/dist/vue.runtime.esm'\n`
 
   // router
   if (router === true) {
-    importTpl += `import Router from 'vue-router'\n`
-    routerTpl +=
-      `Vue.use(Router)\n`;
+    
 
-    if (appFiles.router) {
-      importTpl += `import routerOption from '@/router/index'\n`
-      routerTpl += `let router = new Router(routerOption)\n`
-      vueOptions += 'router,\n'
+    if (router && appFiles.router) {
+      
     }
   }
 
-  vueTpl +=
-    `let vm = new Vue({
-  el: '#root',
-  ${vueOptions}
-  render: h=>{
-    return <div>我在这里</div>
-  }
-})\n`;
+  
 
   let context = {
     appExportDefault: null
@@ -95,17 +88,49 @@ window.${context.namespace.moduleNamespace} = req.mApis;\n`;
     initTpl += `window.$util = util\n`
   }
 
-  // app init
-  if (appFiles.app) {
-    delete require.cache[path.resolve(appSrc, 'app.js')];
-    let fn = require(path.resolve(appSrc, 'app.js'))
-    importTpl += `import app from '@/app';\n`
+  // init file
+  if (appFiles.init) {
+    delete require.cache[path.resolve(appSrc, 'init.js')];
+    let fn = require(path.resolve(appSrc, 'init.js'))
+    importTpl += `import init from '@/init';\n`
     context.appExportDefault = fn.default;
     if (type(fn.default, 'function')) {
-      initTpl += `app(vm, Vue);\n`
+      initTpl += `init && init(vm, Vue);\n`
     }
 
   }
+  
+  // 处理 vue option
+  let renderComp = '';
+  let vueOptions = '';
+  // vue render options
+  if(appFiles.App){
+    importTpl += `import App from '@/App.vue'\n`
+    renderComp += '<App></App>';
+    vueOptions+= `component: {App},\n`
+  } else if (router && appFiles.router){
+    importTpl += `import Router from 'vue-router'\n`
+    routerTpl +=
+      `Vue.use(Router)\n`;
+    importTpl += `import routerOption from '@/router/index'\n`
+    routerTpl += `let router = new Router(routerOption)\n`
+    vueOptions += 'router,\n'
+    renderComp += '<router-view></router-view>';
+  }else{
+    renderComp += `<div>make sure you have <strong>App.vue</strong>  or <strong>router/index.js</strong>  if you turn on router mode</div>`;
+  }
+
+  // vue content
+  vueTpl +=
+    `let vm = new Vue({
+  el: '#root',
+  ${vueOptions}
+  render: h=>{
+    return ${renderComp}
+  }
+})\n`;
+
+
 
   return {
     code: importTpl + routerTpl + vueTpl + reqTpl + initTpl,
