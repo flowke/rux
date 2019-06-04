@@ -12,14 +12,12 @@ const {
 } = require('./dev-utils/devServerUtils');
 
 module.exports = class Server {
-  constructor(webpackConfig, devOption) {
+  constructor() {
     this.validPort = null;
     this.devServer = null;
-    this.webpackConfig = webpackConfig;
-    this.devOption = devOption;
 
     this.hooks = {
-      buildDone: new SyncHook(['parsedUrl']),
+      started: new SyncHook(['parsedUrl']),
       listened: new SyncHook()
     }
   }
@@ -30,14 +28,14 @@ module.exports = class Server {
     return compiler;
   }
 
-  serve(validPort, serverConfig) {
+  serve(validPort, serverConfig, webpackConfig) {
 
     let {
       port: dfPort,
       host
     } = serverConfig;
 
-    let compiler = this.createCompiler(webpack, this.webpackConfig);
+    let compiler = this.createCompiler(webpack, webpackConfig);
     const devServer = new WebpackDevServer(compiler, serverConfig);
 
     let parsedUrl = parseUrl('http', host, dfPort);
@@ -46,12 +44,13 @@ module.exports = class Server {
       if (err) {
         throw error
       }
+      
 
-      this.devServer = devServer;
-      this.validPort = validPort;
-
+      let isFirstTime = true;
       compiler.hooks.done.tap('done', () => {
-        this.hooks.buildDone.call(parsedUrl);
+        if (!isFirstTime) return;
+        isFirstTime = false;
+        this.hooks.started.call(parsedUrl);
       })
 
     });
@@ -59,12 +58,12 @@ module.exports = class Server {
     return devServer;
   }
 
-  run() {
+  run(devOption, webpackConfig) {
 
     let {
       port,
       host
-    } = this.devOption;
+    } = devOption;
 
     let p = null;
 
@@ -72,10 +71,13 @@ module.exports = class Server {
       p = Promise.resolve(this.validPort)
     } else {
       p = useValidPort(port, host)
+        .then(port => this.validPort=port)
     }
 
     return p
-      .then(valiPort => this.serve(valiPort, this.devOption))
+      .then(valiPort => {
+        this.devServer = this.serve(valiPort, devOption, webpackConfig);
+      })
       .catch(e => {
 
         console.log(chalk.cyan('stop launching the dev server.'));
@@ -87,7 +89,7 @@ module.exports = class Server {
 
   }
 
-  start() {
+  start(devOption, webpackConfig) {
 
     process.on('warning', m => {
       console.log();
@@ -96,8 +98,16 @@ module.exports = class Server {
       console.log(chalk.yellow.bold(m.message));
     })
 
-    this.run(true);
+    this.run(devOption, webpackConfig);
     
+  }
+
+  restart(devOption, webpackConfig){
+    if(this.devServer) return;
+    this.devServer.close();
+    process.nextTick(()=>{
+      this.run(devOption, webpackConfig)
+    });
   }
 
 }

@@ -11,33 +11,45 @@ const {
 } = require("tapable");
 
 
+
 module.exports = function(target) {
   let runServer = path.resolve(__dirname, `${target}ServerStart.js`);
-  let server = cp.fork(runServer);
+  // let server = cp.fork(runServer);
 
   let isFirstTimeOpen = true;
+
+  let serve = require(runServer)();
+
+  serve.hooks.started.tap('serverStarted', (parsedUrl)=>{
+    if (isFirstTimeOpen) printBrowserOpenInfo(parsedUrl);
+    isFirstTimeOpen = false;
+    console.log('open');
+
+    openBrowser(parsedUrl.localUrl)
+  })
 
   let hooks = {
     restart: new SyncHook()
   }
 
-  server.on('message', m=>{
+  // server.on('message', m=>{
 
-    if ((type(m, 'object') || m.msg === 'buildDone') && isFirstTimeOpen){
-
-      isFirstTimeOpen = false;
-      let parsedUrl = m.data;
-
-      printBrowserOpenInfo(parsedUrl);
-      openBrowser(parsedUrl.localUrl)
-    }
-  })
+  //   if ((type(m, 'object') || m.msg === 'serverStarted')  ){
+  //     let parsedUrl = m.data;
+  //     if (isFirstTimeOpen) printBrowserOpenInfo(parsedUrl);
+  //     isFirstTimeOpen = false;
+  //     console.log('open');
+      
+  //     openBrowser(parsedUrl.localUrl)
+      
+      
+  //   }
+    
+  // })
   
   watchConfig(path => {
 
-    hooks.restart.call();
-    server.kill();
-    server = cp.fork(runServer)
+    serve.restart();
   });
 
   process.on('SIGINT', function () {
