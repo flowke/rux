@@ -74,11 +74,36 @@ function watchConfig(cb = f => f) {
   let watcher = watch('configDir', path.join(appRoot, 'config'));
   let timer = null;
   watcher.on('change', (path) => {
+
     clearTimeout(timer);
     timer = setTimeout(() => {
 
       console.log();
       console.log(chalk.bold.green('cause config file changed, try to restart the server...'));
+      console.log(chalk.bold.green('  file: ' + path));
+      console.log();
+
+      cb(path);
+    }, 500);
+  });
+  watcher.on('add', (path) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+
+      console.log();
+      console.log(chalk.bold.green('cause config file add, try to restart the server...'));
+      console.log(chalk.bold.green('  file: ' + path));
+      console.log();
+
+      cb(path);
+    }, 500);
+  });
+  watcher.on('unlink', (path) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+
+      console.log();
+      console.log(chalk.bold.green('cause config file unlink, try to restart the server...'));
       console.log(chalk.bold.green('  file: ' + path));
       console.log();
 

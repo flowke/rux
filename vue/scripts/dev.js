@@ -23,6 +23,8 @@ let prevContext = create();
 emitFile(prevContext.code, ()=>{
   if (!started) {
     let startContext = start('vue');
+    console.log('start');
+    
     startContext.hooks.restart.tap('restart', () => {
 
       console.log('restart, dev');

@@ -71,6 +71,7 @@ function getUserOptions(root='./') {
   let configPath = path.resolve(root, 'config/config.js');
 
   if (fse.existsSync(configPath)) {
+    delete require.cache[configPath];
     options = require(configPath);
   }
   return options;
