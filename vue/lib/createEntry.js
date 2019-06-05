@@ -11,9 +11,6 @@ module.exports = function create() {
     paths: optionsPaths
   } = createOption();
 
-  console.log(router, 'router');
-  
-
   let { appSrc } = optionsPaths;
 
   let appFiles = getAppFiles(appSrc)

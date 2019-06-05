@@ -3,7 +3,6 @@ const type = require('../../utils/type');
 const path = require('path');
 let {getType} = type;
 
-let appFn = null;
 
 module.exports = function (cwd,cb=f=>f) {
   
@@ -13,15 +12,15 @@ module.exports = function (cwd,cb=f=>f) {
     'src/index.html',
     'src/services/*',
     'src/utils/util.js',
-    'src/router/*',
+    'src/router/index.js',
   ],{
     cwd
   });
 
   watcher
-    .on('add', ()=>{cb({add: true})})
-    .on('addDir', ()=>{cb({addDir: true})})
-    .on('unlink', ()=>{cb({unlink: true})})
+    .on('add', (ev)=>{cb('add '+ev)})
+    .on('addDir', (ev)=>{cb('addDir '+ev)})
+    .on('unlink', (ev)=>{cb(ev)})
 
   chokidar.watch([
     'src/services/config.js',
@@ -31,12 +30,12 @@ module.exports = function (cwd,cb=f=>f) {
   })
     .on('change',(p)=>{
       if (p === 'src/app.js'){
-        return cb({ appDefaultExport: true });
+        return cb(p);
       }
       
       if (p === 'src/services/config.js'){
 
-        return cb({ serviceNamespace: true});
+        return cb(p);
       }
       
     })

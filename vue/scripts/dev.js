@@ -7,14 +7,25 @@ const watchFile = require('../lib/watchFile');
 const create = require('../lib/createEntry');
 const debounce = require('../../utils/debounce')
 
+let dbugEntry = require('debug')('emitEntry:')
+
+dbugEntry('inject entry.')
+
+createOption.inject({
+  paths: {
+    entryPoint: path.resolve(__dirname, '../../', '.entry.js')
+  }
+});
+
 let started = false;
 
 function emitFile(code, cb) {
   fse.outputFile(path.resolve(__dirname,'../../', '.entry.js'), code, err => {
     if(err) throw err;
 
-    cb && cb()
+    dbugEntry('entry generated')
 
+    cb && cb()
   })
 }
 
@@ -23,12 +34,8 @@ let prevContext = create();
 emitFile(prevContext.code, ()=>{
   if (!started) {
     let startContext = start('vue');
-    console.log('start');
-    
     startContext.hooks.restart.tap('restart', () => {
 
-      console.log('restart, dev');
-      
       emitFile(create().code)
     })
   }
@@ -46,6 +53,8 @@ watchFile(createOption().appRoot, debounce.exec(500, (emitPath) => {
   // if (emitPath.serviceNamespace && _.isEqual(context.serviceNamespace, prevContext.namespace)){
   //   return ;
   // }
+
+  dbugEntry('file change: ' + emitPath)
 
   emitFile(code);
   prevContext = context

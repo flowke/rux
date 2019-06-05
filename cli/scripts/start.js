@@ -1,7 +1,5 @@
 const createOption = require('../config/options');
 const { watch, unwatch } = require('../lib/dev-utils/watch');
-const process = require('process');
-const cp = require('child_process');
 const chalk = require('chalk');
 const path = require('path');
 const type = require('../../utils/type');
@@ -11,10 +9,8 @@ const {
 } = require("tapable");
 
 
-
 module.exports = function(target) {
   let runServer = path.resolve(__dirname, `${target}ServerStart.js`);
-  // let server = cp.fork(runServer);
 
   let isFirstTimeOpen = true;
 
@@ -23,7 +19,6 @@ module.exports = function(target) {
   serve.hooks.started.tap('serverStarted', (parsedUrl)=>{
     if (isFirstTimeOpen) printBrowserOpenInfo(parsedUrl);
     isFirstTimeOpen = false;
-    console.log('open');
 
     openBrowser(parsedUrl.localUrl)
   })
@@ -31,33 +26,16 @@ module.exports = function(target) {
   let hooks = {
     restart: new SyncHook()
   }
-
-  // server.on('message', m=>{
-
-  //   if ((type(m, 'object') || m.msg === 'serverStarted')  ){
-  //     let parsedUrl = m.data;
-  //     if (isFirstTimeOpen) printBrowserOpenInfo(parsedUrl);
-  //     isFirstTimeOpen = false;
-  //     console.log('open');
-      
-  //     openBrowser(parsedUrl.localUrl)
-      
-      
-  //   }
-    
-  // })
   
   watchConfig(path => {
 
     serve.restart();
+    hooks.restart.call();
   });
 
-  process.on('SIGINT', function () {
-    server.kill();
-    process.exit();
-
-
-  });
+  // process.on('SIGINT', function () {
+  //  serve.server.close();
+  // });
 
   return {
     hooks

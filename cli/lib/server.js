@@ -2,6 +2,8 @@ const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const chalk = require('chalk');
 
+let dbug = require('debug')('server: ')
+
 const {
   SyncHook
 } = require("tapable"); 
@@ -38,18 +40,19 @@ module.exports = class Server {
     let compiler = this.createCompiler(webpack, webpackConfig);
     const devServer = new WebpackDevServer(compiler, serverConfig);
 
-    let parsedUrl = parseUrl('http', host, dfPort);
+    let parsedUrl = parseUrl('http', host, validPort);
 
     devServer.listen(validPort, host, err => {
       if (err) {
         throw error
       }
-      
+      dbug('server listened at ' + validPort)
 
       let isFirstTime = true;
       compiler.hooks.done.tap('done', () => {
         if (!isFirstTime) return;
         isFirstTime = false;
+        dbug('build done')
         this.hooks.started.call(parsedUrl);
       })
 
@@ -107,7 +110,13 @@ module.exports = class Server {
     this.devServer.close();
     process.nextTick(()=>{
       this.run(devOption, webpackConfig)
+      dbug('restart')
     });
+  }
+
+  close(){
+    dbug('close')
+    this.devServer && this.devServer.close();
   }
 
 }
