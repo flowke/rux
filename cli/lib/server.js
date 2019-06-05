@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const chalk = require('chalk');
 
-let dbug = require('debug')('server: ')
+let dbug = require('debug')('server:')
 
 const {
   SyncHook
@@ -19,8 +19,8 @@ module.exports = class Server {
     this.devServer = null;
 
     this.hooks = {
-      started: new SyncHook(['parsedUrl']),
-      listened: new SyncHook()
+      firstTimeBuildDone: new SyncHook(['parsedUrl']),
+      listened: new SyncHook(['parsedUrl'])
     }
   }
 
@@ -33,7 +33,6 @@ module.exports = class Server {
   serve(validPort, serverConfig, webpackConfig) {
 
     let {
-      port: dfPort,
       host
     } = serverConfig;
 
@@ -41,19 +40,22 @@ module.exports = class Server {
     const devServer = new WebpackDevServer(compiler, serverConfig);
 
     let parsedUrl = parseUrl('http', host, validPort);
-
+    dbug('serve')
+    let isFirstTime = true;
     devServer.listen(validPort, host, err => {
       if (err) {
         throw error
       }
-      dbug('server listened at ' + validPort)
 
-      let isFirstTime = true;
+      dbug('server listened at ' + validPort)
+      this.hooks.listened.call(parsedUrl);
+
       compiler.hooks.done.tap('done', () => {
+        dbug('compiler build done')
         if (!isFirstTime) return;
         isFirstTime = false;
-        dbug('build done')
-        this.hooks.started.call(parsedUrl);
+        dbug('first time build done')
+        this.hooks.firstTimeBuildDone.call(parsedUrl);
       })
 
     });
@@ -76,7 +78,7 @@ module.exports = class Server {
       p = useValidPort(port, host)
         .then(port => this.validPort=port)
     }
-
+    dbug('get valid port: '+this.validPort)
     return p
       .then(valiPort => {
         this.devServer = this.serve(valiPort, devOption, webpackConfig);
@@ -100,17 +102,19 @@ module.exports = class Server {
       console.log();
       console.log(chalk.yellow.bold(m.message));
     })
-
+    dbug('restart')
     this.run(devOption, webpackConfig);
     
   }
 
   restart(devOption, webpackConfig){
-    if(this.devServer) return;
+    dbug('restart call')
+    if(!this.devServer) return;
     this.devServer.close();
     process.nextTick(()=>{
+      dbug('restart reach')
       this.run(devOption, webpackConfig)
-      dbug('restart')
+      
     });
   }
 

@@ -1,19 +1,20 @@
 const parseNamespace = require('./requestNamespace');
 const type = require('../../utils/type')
 const createOption = require('../../cli/config/options');
-const getAppFiles = require('./appFiles');
+const getAppFiles = require('./mayPath');
 const path = require('path');
 module.exports = function create() {
 
   let {
     request = true,
     router,
-    paths: optionsPaths
+    paths: optionsPaths,
+    appRoot
   } = createOption();
 
   let { appSrc } = optionsPaths;
 
-  let appFiles = getAppFiles(appSrc)
+  let appFiles = getAppFiles(appRoot)
 
   let importTpl = '';
   let vueTpl = '';
@@ -22,21 +23,8 @@ module.exports = function create() {
   let initTpl = '';
   let appTpl = '';
 
-  
-
   // vue
-  importTpl += `import Vue from 'vue/dist/vue.runtime.esm'\n`
-
-  // router
-  if (router === true) {
-    
-
-    if (router && appFiles.router) {
-      
-    }
-  }
-
-  
+  importTpl += `import Vue from 'vue/dist/vue.runtime.esm'\n`  
 
   let context = {
     appExportDefault: null
@@ -47,9 +35,9 @@ module.exports = function create() {
     context.namespace = parseNamespace({});
 
     let optionCode = '';
-    if (appFiles.services.config) {
-      delete require.cache[path.resolve(appSrc, appFiles.services.config)];
-      let config = require(path.resolve(appSrc, appFiles.services.config));
+    if (appFiles.services.config()) {
+      delete require.cache[appFiles.services.config('abs')];
+      let config = require(appFiles.services.config('abs'));
 
       context.namespace = parseNamespace(config.namespace);
 
@@ -70,7 +58,7 @@ window.${context.namespace.pathNamespace} = req.apis;
 window.${context.namespace.moduleNamespace} = req.mApis;\n`;
 
     appFiles.services.apis.forEach(file => {
-      importTpl += `import __${file.name} from '@/${file.path}';\n`;
+      importTpl += `import __${file.name} from '@@/${file.path()}';\n`;
       reqTpl += `req.moduleRegister(__${file.name}, '${file.name}');\n`;
     })
 
@@ -80,15 +68,15 @@ window.${context.namespace.moduleNamespace} = req.mApis;\n`;
 
 
   // utils
-  if (appFiles.util) {
+  if (appFiles.util()) {
     importTpl += `import * as util from '@/utils/util';\n`
     initTpl += `window.$util = util\n`
   }
 
   // init file
-  if (appFiles.init) {
-    delete require.cache[path.resolve(appSrc, 'init.js')];
-    let fn = require(path.resolve(appSrc, 'init.js'))
+  if (appFiles.init()) {
+    delete require.cache[appFiles.init('abs')];
+    let fn = require(appFiles.init('abs'))
     importTpl += `import init from '@/init';\n`
     context.appExportDefault = fn.default;
     if (type(fn.default, 'function')) {
@@ -101,11 +89,11 @@ window.${context.namespace.moduleNamespace} = req.mApis;\n`;
   let renderComp = '';
   let vueOptions = '';
   // vue render options
-  if(appFiles.App){
+  if(appFiles.App()){
     importTpl += `import App from '@/App.vue'\n`
     renderComp += '<App></App>';
     vueOptions+= `component: {App},\n`
-  } else if (router && appFiles.router){
+  } else if (router && appFiles.router()){
     importTpl += `import Router from 'vue-router'\n`
     routerTpl +=
       `Vue.use(Router)\n`;

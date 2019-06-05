@@ -33,9 +33,6 @@ module.exports = function(target) {
     hooks.restart.call();
   });
 
-  // process.on('SIGINT', function () {
-  //  serve.server.close();
-  // });
 
   return {
     hooks

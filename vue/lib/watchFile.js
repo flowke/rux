@@ -1,42 +1,35 @@
 const chokidar = require('chokidar');
 const type = require('../../utils/type');
 const path = require('path');
+const files = require('./effectedFiles');
+const toArr = require('../../utils/toArr')
 let {getType} = type;
 
 
 module.exports = function (cwd,cb=f=>f) {
   
-  let watcher = chokidar.watch([
-    'src/init.js',
-    'src/App.vue',
-    'src/index.html',
-    'src/services/*',
-    'src/utils/util.js',
-    'src/router/index.js',
-  ],{
-    cwd
+  let watcher = chokidar.watch(toArr(files).values,{
+    cwd,
+    ignoreInitial: true
   });
 
-  watcher
-    .on('add', (ev)=>{cb('add '+ev)})
-    .on('addDir', (ev)=>{cb('addDir '+ev)})
-    .on('unlink', (ev)=>{cb(ev)})
+  function handler(path, ev) {
+    let match = /services\/(.+)\.js/.exec(path)
 
-  chokidar.watch([
-    'src/services/config.js',
-    'src/init.js',
-  ], {
-      cwd
-  })
-    .on('change',(p)=>{
-      if (p === 'src/app.js'){
-        return cb(p);
-      }
-      
-      if (p === 'src/services/config.js'){
-
-        return cb(p);
-      }
-      
+    let isConfig = /config\/config/.test(path)
+    
+    if (ev === 'change' && match[1] && match[1] !== 'config'){
+      return;
+    }
+    cb(path,{
+      isConfig
     })
+  }
+
+  watcher
+    .on('add', (p)=>handler(p, 'add'))
+    .on('change', (p) => handler(p, 'change'))
+    .on('unlink', (p) => handler(p, 'unlink'));
+
+
 }

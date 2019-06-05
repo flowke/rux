@@ -7,7 +7,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 const babelConfig = require('./babel.config');
 const WebpackBuildNotifierPlugin = require('./plugin/notifier');
-const NyanProgressPlugin = require('nyan-progress-webpack-plugin');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 const options = require('./options')();
 
@@ -74,7 +74,8 @@ cfg.merge({
 
   resolve: {
     alias: {
-      '@': path.resolve(options.appRoot, 'src')
+      '@': path.resolve(options.appRoot, 'src'),
+      '@@': path.resolve(options.appRoot),
     }
   },
 
@@ -256,12 +257,11 @@ cfg.merge({
         suppressSuccess: 'initial'
       }]
     },
-    NyanProgressPlugin: {
-      plugin: NyanProgressPlugin,
+    ProgressBarPlugin: {
+      plugin: ProgressBarPlugin,
       args: [{
-        nyanCatSays: (progress, msg) => {
-          return progress === 1 ? 'done for you!' : Math.round(progress*100)+'%'
-        }
+        clear: false,
+        complete: '-'
       }]
     },
     // FriendlyErrorsPlugin: {
