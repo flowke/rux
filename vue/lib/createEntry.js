@@ -2,6 +2,7 @@ const parseNamespace = require('./requestNamespace');
 const type = require('../../utils/type')
 const createOption = require('../../cli/config/options');
 const getAppFiles = require('./mayPath');
+const createChunks = require('./chunkBlock/createChunkBlock');
 const path = require('path');
 module.exports = function create() {
 
@@ -12,19 +13,13 @@ module.exports = function create() {
     appRoot
   } = createOption();
 
-  let { appSrc } = optionsPaths;
-
   let appFiles = getAppFiles(appRoot)
 
-  let importTpl = '';
-  let vueTpl = '';
-  let routerTpl = '';
-  let reqTpl = '';
-  let initTpl = '';
-  let appTpl = '';
+  let chunks = createChunks();
 
   // vue
-  importTpl += `import Vue from 'vue/dist/vue.runtime.esm'\n`  
+  chunks.import(`import Vue from 'vue/dist/vue.runtime.esm'`)
+ 
 
   let context = {
     appExportDefault: null
@@ -32,93 +27,79 @@ module.exports = function create() {
 
   // requset
   if (request) {
-    context.namespace = parseNamespace({});
 
+    chunks.import(`import Request from 'puta'`)
+
+    context.puta = parseNamespace({});
     let optionCode = '';
     if (appFiles.services.config()) {
       delete require.cache[appFiles.services.config('abs')];
       let config = require(appFiles.services.config('abs'));
 
-      context.namespace = parseNamespace(config.namespace);
-
+      context.puta = parseNamespace(config.puta);
 
       // 如果导出了options
       if (config.options) {
-        importTpl += `import * as serviceCfg from '@/services/config';\n`;
+        chunks.import(`import * as serviceCfg from '@/services/config';`)
         optionCode = `serviceCfg.options`
       }
 
     }
-
-    reqTpl +=
-      `let req = new Request(${optionCode});
-
-window.${context.namespace.requestName} = req;
-window.${context.namespace.pathNamespace} = req.apis;
-window.${context.namespace.moduleNamespace} = req.mApis;\n`;
+    chunks.code(`let puta = new Request(${optionCode});`)
+    chunks.code(`window.${context.puta.instance} = puta;`)
+    chunks.code(`window.${context.puta.apis} = puta.apis;`)
+    chunks.code(`window.${context.puta.mApis} = puta.mApis;`)
 
     appFiles.services.apis.forEach(file => {
-      importTpl += `import __${file.name} from '@@/${file.path()}';\n`;
-      reqTpl += `req.moduleRegister(__${file.name}, '${file.name}');\n`;
+      chunks.import(`import __${file.name} from '@@/${file.path()}';`)
+      chunks.code(`puta.moduleRegister(__${file.name}, '${file.name}');`)
     })
 
-    importTpl +=
-      `import Request from 'puta';\n`
   }
 
 
   // utils
   if (appFiles.util()) {
-    importTpl += `import * as util from '@/utils/util';\n`
-    initTpl += `window.$util = util\n`
+    chunks.import(`import * as util from '@/utils/util'`)
+    chunks.code(`window.$util = util`)
+  }
+  
+  // 处理 vue option
+  // vue render options
+  if(appFiles.App()){
+    chunks.import(`import App from '@/App.vue'`)
+    chunks.vueOptions('render: h=>(<App></App>),')
+    chunks.vueOptions('component: {App},')
+  } else if (router && appFiles.router()){
+    chunks.import(`import Router from 'vue-router'`)
+    chunks.import(`import routerOption from '@/router/index'`)
+    chunks.code(`Vue.use(Router)`)
+    chunks.code(`let router = new Router(routerOption)`)
+    chunks.vueOptions(`router,`)
+    chunks.vueOptions(`render: h=>(<router-view></router-view>),`)
+    
+  }else{
+    chunks.vueOptions(`render: h=>(<div>make sure you have <strong>App.vue</strong>  or <strong>router/index.js</strong>  if you turn on router mode</div>),`)
   }
 
   // init file
   if (appFiles.init()) {
     delete require.cache[appFiles.init('abs')];
     let fn = require(appFiles.init('abs'))
-    importTpl += `import init from '@/init';\n`
+
+    chunks.import(`import init from '@/init'`)
+
     context.appExportDefault = fn.default;
     if (type(fn.default, 'function')) {
-      initTpl += `init && init(vm, Vue);\n`
+      chunks.subCode(`init && init(vm, Vue);`)
     }
 
   }
-  
-  // 处理 vue option
-  let renderComp = '';
-  let vueOptions = '';
-  // vue render options
-  if(appFiles.App()){
-    importTpl += `import App from '@/App.vue'\n`
-    renderComp += '<App></App>';
-    vueOptions+= `component: {App},\n`
-  } else if (router && appFiles.router()){
-    importTpl += `import Router from 'vue-router'\n`
-    routerTpl +=
-      `Vue.use(Router)\n`;
-    importTpl += `import routerOption from '@/router/index'\n`
-    routerTpl += `let router = new Router(routerOption)\n`
-    vueOptions += 'router,\n'
-    renderComp += '<router-view></router-view>';
-  }else{
-    renderComp += `<div>make sure you have <strong>App.vue</strong>  or <strong>router/index.js</strong>  if you turn on router mode</div>`;
-  }
-
-  // vue content
-  vueTpl +=
-    `let vm = new Vue({
-  el: '#root',
-  ${vueOptions}
-  render: h=>{
-    return ${renderComp}
-  }
-})\n`;
 
 
 
   return {
-    code: importTpl + routerTpl + vueTpl + reqTpl + initTpl,
+    code: chunks.genCode(),
     serviceNamespace: context.namespace,
     appExportDefault: context.appExportDefault
   }

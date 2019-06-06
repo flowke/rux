@@ -17,6 +17,7 @@ module.exports = function (cwd,cb=f=>f) {
     let match = /services\/(.+)\.js/.exec(path)
 
     let isConfig = /config\/config/.test(path)
+    console.log(path, ev);
     
     if (ev === 'change' && match && match[1] && match[1] !== 'config') {
       return;
