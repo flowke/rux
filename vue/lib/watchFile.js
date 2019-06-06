@@ -18,7 +18,7 @@ module.exports = function (cwd,cb=f=>f) {
 
     let isConfig = /config\/config/.test(path)
     
-    if (ev === 'change' && match[1] && match[1] !== 'config'){
+    if (ev === 'change' && match && match[1] && match[1] !== 'config') {
       return;
     }
     cb(path,{

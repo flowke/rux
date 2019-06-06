@@ -35,7 +35,7 @@ module.exports = class Server {
     let {
       host
     } = serverConfig;
-
+    // WebpackDevServer.addDevServerEntrypoints(webpackConfig, serverConfig);
     let compiler = this.createCompiler(webpack, webpackConfig);
     const devServer = new WebpackDevServer(compiler, serverConfig);
 

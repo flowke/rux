@@ -8,7 +8,7 @@ const webpack = require('webpack');
 const babelConfig = require('./babel.config');
 const WebpackBuildNotifierPlugin = require('./plugin/notifier');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
-const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
+
 const options = require('./options')();
 
 let {
@@ -261,16 +261,9 @@ cfg.merge({
       plugin: ProgressBarPlugin,
       args: [{
         clear: false,
-        complete: '-'
+        complete: '>'
       }]
     },
-    // FriendlyErrorsPlugin: {
-    //   plugin: FriendlyErrorsPlugin,
-    //   args: [{
-    //     clearConsole: false,
-    //   }]
-      
-    // }
 
   },
 
