@@ -9,11 +9,16 @@ module.exports = function create() {
   let {
     request = true,
     router,
+    vuex,
     paths: optionsPaths,
     appRoot
   } = createOption();
 
   let appFiles = getAppFiles(appRoot)
+
+  console.log(appFiles.vuex.config());
+  appFiles.vuex.modules.forEach(e => console.log(e))
+  
 
   let chunks = createChunks();
 
@@ -74,12 +79,24 @@ module.exports = function create() {
     chunks.import(`import Router from 'vue-router'`)
     chunks.import(`import routerOption from '@/router/index'`)
     chunks.code(`Vue.use(Router)`)
-    chunks.code(`let router = new Router(routerOption)`)
-    chunks.vueOptions(`router,`)
+    chunks.vueOptions(`router: new Router(routerOption),`)
     chunks.vueOptions(`render: h=>(<router-view></router-view>),`)
     
   }else{
     chunks.vueOptions(`render: h=>(<div>make sure you have <strong>App.vue</strong>  or <strong>router/index.js</strong>  if you turn on router mode</div>),`)
+  }
+
+  if(vuex && appFiles.vuex.config()){
+    chunks.import(`import Vuex from 'vuex'`)
+    chunks.import(`import storeConfig from '@/store/index'`)
+    chunks.code(`Vue.use(Vuex)`)
+    chunks.code(`storeConfig.modules = {}`)
+    appFiles.vuex.modules.forEach(m=>{
+      chunks.import(`import __vuex_m_${m.name} from '@@/${m.file()}'`)
+      chunks.code(`storeConfig.modules.${m.name} = __vuex_m_${m.name}`)
+    })
+
+    chunks.vueOptions(`store: new Vuex.Store(storeConfig),`)
   }
 
   // init file

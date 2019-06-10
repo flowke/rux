@@ -7,5 +7,6 @@ module.exports = {
   util: 'src/utils/util.js',
   App: 'src/App.vue',
   template: 'src/index.html',
-  config: 'config/*'
+  config: 'config/*',
+  vuex: ['src/store/index.js', 'src/store/modules/*.js', 'src/pages/*/modules/*.js']
 }

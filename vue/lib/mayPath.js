@@ -3,11 +3,21 @@ const path = require('path');
 const fse = require('fs-extra');
 const files = require('./effectedFiles');
 
-// which effectedFile is present
+// which effectedFile is present\
+
+
 
 module.exports = function(root) {
+  let baseGlobOption = {
+    cwd: root,
+    onlyFiles: true,
+  }
 
-  let { services, ...restFiles } = files;
+  let { services, vuex, ...restFiles } = files;
+
+  function ifAbs(abs, file){
+    return abs ? path.resolve(root, file) : file
+  }
 
   function mayPath(p = '') {
     p = path.resolve(root, p);
@@ -15,18 +25,32 @@ module.exports = function(root) {
   }
   
   let servicesFiles = glob.sync(services, {
-    cwd: root,
-    onlyFiles: true,
+    ...baseGlobOption,
     deep: 0
   });
-  
-  
+
+  let vuexConfig = glob.sync(vuex[0], baseGlobOption)
+  let vuexModules = glob.sync(vuex.slice(1), baseGlobOption)
+
+  let vuexPaths = {
+    config: ()=>'',
+    modules: []
+  }
+
+  if (vuexConfig[0]) vuexPaths.config = abs => ifAbs(abs, vuexConfig[0])
+
+  vuexPaths.modules = vuexModules.map(m=>{
+    return {
+      name: path.basename(m, '.js'),
+      file: abs=> ifAbs(abs, m)
+    }
+  })
 
   let mayPaths = Object.keys(restFiles).reduce((acc, f)=>{
     acc[f] = (abs) => {
       let file = mayPath(restFiles[f]);
 
-      if (file && abs) return path.resolve(root, file)  
+      if (file && abs) return ifAbs(abs, file)  
       return file
     } 
     return acc;
@@ -52,7 +76,7 @@ module.exports = function(root) {
       config: ()=>'',
       apis: []
     }),
-
+    vuex: vuexPaths,
     ...mayPaths
   }
 
