@@ -80,5 +80,25 @@
   },
   "devDependencies": {
     "debug": "^4.1.1"
+  },
+  "config": {
+    "templates": {
+      "simple": {
+        "name": "simple",
+        "describe": "template will only contain vue"
+      },
+      "router": {
+        "name": "router",
+        "describe": "template will contain vue+router"
+      },
+      "vuex": {
+        "name": "vuex",
+        "describe": "template will contain vue+vuex"
+      },
+      "router-vuex": {
+        "name": "router-vuex",
+        "describe": "template will contain vue+router+vuex"
+      }
+    }
   }
 }

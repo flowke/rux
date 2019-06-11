@@ -3,7 +3,6 @@ const inquirer = require('inquirer');
 const chalk = require('chalk');
 const localIp = require('./localIp');
 const url = require('url');
-const chokidar = require('chokidar');
 
 // 询问是否使用新端口
 function inquirerPort(port, validPort) {
