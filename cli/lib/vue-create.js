@@ -4,6 +4,7 @@ const chalk = require('chalk');
 const fse = require('fs-extra');
 const inquirer = require('inquirer');
 const toArr = require('../../utils/toArr');
+const request = require('axios');
 
 
 function logExistDir(dir) {
@@ -133,7 +134,7 @@ module.exports = class Create{
 
   askTemplate(){
 
-    let cfg = toArr(this.tplCfg)
+    let cfg = toArr(this.tplCfg.templates)
     
     return inquirer. prompt([
       {
@@ -165,7 +166,7 @@ module.exports = class Create{
   getTemplateType(){
     let {type } = this.argv;
 
-    if (type && this.tplCfg[type]){
+    if (type && this.tplCfg.templates[type]){
       return Promise.resolve(type)
     }else if(!type){
       return this.askTemplate()
@@ -184,6 +185,18 @@ module.exports = class Create{
   generate(){
     let { validDir, validType, validLocals} = this;
     
+  }
+
+  downloadPackage(name){
+    let pkg = this.tplCfg.package;
+
+  }
+
+  request(url, op){
+    return request(url,op)
+    .then(res=>{
+      return res.data
+    })
   }
 
 

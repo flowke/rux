@@ -16,7 +16,7 @@ const pkgInfo = require('../package.json')
 
 const yargs = require('yargs');
 
-let tplCfg = toArr(pkgInfo.config.templates);
+let tplCfg = toArr(pkgInfo.configVue.templates);
 
 yargs
   .alias('h', 'help')
@@ -48,7 +48,7 @@ yargs
   }, argv => {
     
     process.env.NODE_ENV = "development";
-      new Create().run(argv, pkgInfo.config.templates)
+      new Create().run(argv, pkgInfo.configVue)
   })
   .help()
 
