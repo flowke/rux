@@ -5,6 +5,10 @@ const fse = require('fs-extra');
 const inquirer = require('inquirer');
 const toArr = require('../../utils/toArr');
 const request = require('axios');
+const shell = require('shelljs');
+const compressing = require('compressing');
+const os = require('os');
+const ora = require('ora');
 
 
 function logExistDir(dir) {
@@ -22,12 +26,24 @@ module.exports = class Create{
     this.validDir = null;
     this.validType = null;
     this.validLocals = null;
+
+    this.hasNpm = shell.which('npm')
+    
   }
 
 
   run(argv, tplCfg){
     this.tplCfg = tplCfg
     this.argv = argv;
+
+    
+
+    
+
+    // console.log(process.env);
+    // console.log(process.env.npm_registry);
+    // console.log(process.env.npm_config_registry);
+    
 
     let { createMethod } = argv;
 
@@ -52,6 +68,7 @@ module.exports = class Create{
     .then(locals=>{
       if(locals){
         this.validLocals = locals;
+        return this.generate()
       }
     })
     
@@ -183,12 +200,101 @@ module.exports = class Create{
   }
 
   generate(){
-    let { validDir, validType, validLocals} = this;
+    let { validDir, validType, validLocals, tplCfg} = this;
+
+
+    this.downloadPackage(tplCfg.package)
+    .then(tempdir=>{
+
+      if (tempdir){
+        console.log(tempdir);
+        
+      }
+
+    })
     
   }
 
-  downloadPackage(name){
-    let pkg = this.tplCfg.package;
+  downloadPackage(packageName){
+    let registry = this.getRegistry();
+
+    let url = `${registry}/${packageName}/latest`;
+
+    
+
+    const getTarball = ()=>{
+      return this.request(url)
+        .then(res => {
+          // return null
+          return this.request(res.dist.tarball, { responseType: 'arraybuffer' })
+        })
+        .catch(()=>{
+          return null
+        })
+    }
+
+    const spinner = ora('downloading template').start();
+    let tempdir = '';
+    return getTarball()
+    .then(tarball=>{
+      // 下载失败
+      if (!tarball){
+        spinner.fail('downloading template fail')
+        throw new Error('download fail')
+      }
+
+      spinner.succeed('downloading template succeed!')
+
+      tempdir = path.resolve(os.tmpdir(), 'tha-vue-create-config')
+
+      shell.rm('-rf', tempdir);
+      
+      return compressing.tgz.uncompress(tarball, tempdir)
+    })
+    .then(done=>{
+      spinner.succeed('uncompress template succeed!')
+      
+      return path.resolve(tempdir, 'package')
+    })
+    .catch(err=>{
+      console.log(err);
+      
+      if (err.message !== 'download fail'){
+        spinner.fail('uncompress template fail')
+      }
+
+      process.exit(1)
+    })
+
+
+
+  }
+
+  getRegistry(){
+    let url = '';
+
+    if (!this.hasNpm) {
+      console.log(chalk.red('Ensure npm has been installed!'))
+      process.exit(1);
+    }
+    
+
+    try {
+      
+      url = shell.exec('npm config get registry', { silent: true }).stdout;
+      url = url.trim();
+      url = url.replace(/\/$/, '');
+
+    } catch (error) {
+      url = ''
+    }
+
+    if(!url){
+      console.log(chalk.red('Make sure you set a valid npm registry url'));
+      process.exit(1)
+    }
+
+    return url;
 
   }
 
