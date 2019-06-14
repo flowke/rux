@@ -15,6 +15,7 @@ module.exports = function () {
   let server = new Server();
 
   let printOnce = util.execOnce(printBrowserOpenInfo)
+  let openOnce = util.execOnce(openBrowser)
 
   server.hooks.listened.tap('serverStarted', (parsedUrl) => {
     dbug('listened')
@@ -23,7 +24,7 @@ module.exports = function () {
   server.hooks.firstTimeBuildDone.tap('serverStarted', (parsedUrl) => {
     dbug('firstTimeBuildDone')
     printOnce(parsedUrl);
-    openBrowser(parsedUrl.localUrl)
+    openOnce(parsedUrl.localUrl)
 
   })
 

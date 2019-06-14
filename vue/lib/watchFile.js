@@ -8,7 +8,8 @@ let {getType} = type;
 
 module.exports = function (cwd,cb=f=>f) {
 
-  let { vuex, restFiles } = files
+  let { vuex, ...restFiles } = files
+  
   
   let watcher = chokidar.watch(toArr(restFiles).values.concat(vuex),{
     cwd,
@@ -21,7 +22,6 @@ module.exports = function (cwd,cb=f=>f) {
     let vuexModulesMatch = /modules\/(.+)\.js$/.exec(path);
 
     let isConfig = /config\/config/.test(path)
-    console.log(path, ev);
     
     if (ev === 'change' && servicesApiMatch && servicesApiMatch[1] && servicesApiMatch[1] !== 'config') {
       return;

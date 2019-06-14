@@ -11,7 +11,6 @@ const os = require('os');
 const ora = require('ora');
 const swig = require('swig');
 
-
 const spinner = ora();
 
 function logExistDir(dir) {
@@ -78,7 +77,19 @@ module.exports = class Create{
     })
     .then(done=>{
       if(done){
-        this.logUsage()
+
+        if (this.createMethod === 'init'){
+          let dir = path.basename(this.validDir)
+          shell.cd(dir)
+
+        } 
+
+        spinner.start('install packsges...')
+        shell.exec(`npm i`, {silent: true},(code, stdout, stderr) => {
+          spinner.succeed()
+          this.logUsage()
+        })
+        
       }
     })
     
@@ -246,8 +257,15 @@ module.exports = class Create{
       // to abs path
       let to = path.resolve(validDir, file).replace(tplName, realName)
 
+      let content = ''
+
       // rendered content
-      let content = swig.renderFile(fullPath, validLocals);
+      if (/src/.test(fullPath)){
+        content = fse.readFileSync(fullPath)
+      }else{
+        content = swig.renderFile(fullPath, validLocals);
+      }
+      
 
       if(isJson){
         content = JSON.parse(content);
@@ -299,8 +317,9 @@ module.exports = class Create{
   }
 
   downloadPackage(packageName){
+    spinner.start('get downloading registry')
     let registry = this.getRegistry();
-
+    spinner.succeed(`got registry: ${registry}`)
     let url = `${registry}/${packageName}/latest`;
 
     const getTarball = ()=>{
@@ -388,8 +407,9 @@ module.exports = class Create{
 
   logUsage(){
     let cd = '';
-
-    if (this.createMethod === 'init') cd = `cd ${path.basename(this.validDir)}`
+    if (this.createMethod === 'init') {
+      cd = `- cd ${path.basename(this.validDir)}`
+    }
     console.log();
     
     console.log(`usage:

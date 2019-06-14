@@ -15,11 +15,7 @@ module.exports = function create() {
   } = createOption();
 
   let appFiles = getAppFiles(appRoot)
-
-  console.log(appFiles.vuex.config());
-  appFiles.vuex.modules.forEach(e => console.log(e))
   
-
   let chunks = createChunks();
 
   // vue

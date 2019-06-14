@@ -14,6 +14,7 @@ module.exports = {
     puta: 'latest',
     'core-js': '2',
     'core-js': '3',
+    '@babel/runtime': 'latest'
   },
 
   devCommonLibs: {

@@ -36,6 +36,7 @@ watchFile(createOption().appRoot, debounce.exec(500, (emitPath, pathKey) => {
   }
 
   emitFile(create().code, ()=>{
+
     if (pathKey.isConfig){
       console.log();
       console.log(chalk.bold.green('cause config file changed, try to restart the server...'));

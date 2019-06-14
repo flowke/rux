@@ -14,7 +14,7 @@ let chunks = {
 chunks.vue.opsChunk = ''
 chunks.vue.injectOption = function(str){
   this.opsChunk += str
-  // console.log(this.opsChunk, 'this.opsChunk')
+
 }
 
 chunks.vue.genOptionsCode = function(){
