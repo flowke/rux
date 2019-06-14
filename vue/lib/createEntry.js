@@ -33,7 +33,7 @@ module.exports = function create() {
   // requset
   if (request) {
 
-    chunks.import(`import Request from 'puta'`)
+    chunks.import(`import Request from 'puta/lib/index'`)
 
     context.puta = parseNamespace({});
     let optionCode = '';

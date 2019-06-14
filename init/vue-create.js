@@ -3,13 +3,16 @@ const path = require('path');
 const chalk = require('chalk');
 const fse = require('fs-extra');
 const inquirer = require('inquirer');
-const toArr = require('../../utils/toArr');
+const toArr = require('../utils/toArr');
 const request = require('axios');
 const shell = require('shelljs');
 const compressing = require('compressing');
 const os = require('os');
 const ora = require('ora');
+const swig = require('swig');
 
+
+const spinner = ora();
 
 function logExistDir(dir) {
   console.log();
@@ -23,11 +26,19 @@ module.exports = class Create{
     this.argv = null;
     this.tplCfg = null;
 
+    // 生成文件被放置的地方
     this.validDir = null;
     this.validType = null;
     this.validLocals = null;
+    this.name = '';
+    this.createMethod = '';
 
     this.hasNpm = shell.which('npm')
+
+    this.filenameMapping = {
+      '_.gitignore': '.gitignore',
+      '_package.json': 'package.json',
+    };
     
   }
 
@@ -35,17 +46,10 @@ module.exports = class Create{
   run(argv, tplCfg){
     this.tplCfg = tplCfg
     this.argv = argv;
-
     
-
-    
-
-    // console.log(process.env);
-    // console.log(process.env.npm_registry);
-    // console.log(process.env.npm_config_registry);
-    
-
     let { createMethod } = argv;
+
+    this.createMethod = createMethod;
 
     let p = Promise.resolve(null)
 
@@ -55,6 +59,7 @@ module.exports = class Create{
     p
     .then(dir=>{
       if(dir){
+        this.name = 
         this.validDir = dir;
         return this.getTemplateType()
       }
@@ -71,22 +76,34 @@ module.exports = class Create{
         return this.generate()
       }
     })
+    .then(done=>{
+      if(done){
+        this.logUsage()
+      }
+    })
     
   }
 
   getInitDir(){
-    let { dir } = this.argv;
+    let { dir, force } = this.argv;
 
     let p = Promise.resolve(null);
 
     if(dir){
       p = Promise.resolve(dir)
       .then(dir=>{
-        let existDir = fse.existsSync(path.resolve(dir))
-        if (existDir) {
-          logExistDir(dir)
-          return null
+
+        if(force){
+          shell.rm('-rf', path.resolve(dir) )
+        }else{
+          let existDir = fse.existsSync(path.resolve(dir))
+          if (existDir) {
+            logExistDir(dir)
+            return null
+          }
         }
+
+        
 
         return path.resolve(dir)
       })
@@ -153,7 +170,7 @@ module.exports = class Create{
 
     let cfg = toArr(this.tplCfg.templates)
     
-    return inquirer. prompt([
+    return inquirer.prompt([
       {
         type: 'list',
         message: 'please choose a template',
@@ -194,23 +211,89 @@ module.exports = class Create{
   }
 
   getTemplateLocals(){
+    const dep  = require('./vue-dependencies');
+    let type = this.validType;
+
+    let depType = dep.type[type];
+
+    let dependencies = depType.prod.reduce((acc, lib)=>{
+      acc[lib] = dep.libs[lib]
+      return acc
+    }, dep.commonLibs)
+
+    let devDependencies = depType.dev.reduce((acc, lib) => {
+      acc[lib] = dep.devLibs[lib]
+      return acc
+    }, dep.devCommonLibs)
+
     return Promise.resolve({
-      name: path.basename(this.validDir)
+      packageName: path.basename(this.validDir),
+      dependencies,
+      devDependencies
     })
   }
 
   generate(){
     let { validDir, validType, validLocals, tplCfg} = this;
 
+    let renderFile = (file, baseRoot )=>{
+      let tplName = path.basename(file);
+      let realName = this.filenameMapping[tplName] || tplName
+      let isJson = path.extname(tplName)==='.json'
 
-    this.downloadPackage(tplCfg.package)
-    .then(tempdir=>{
+      // from abs path
+      let fullPath = path.resolve(baseRoot, file)
+      // to abs path
+      let to = path.resolve(validDir, file).replace(tplName, realName)
 
-      if (tempdir){
-        console.log(tempdir);
+      // rendered content
+      let content = swig.renderFile(fullPath, validLocals);
+
+      if(isJson){
+        content = JSON.parse(content);
+        content = JSON.stringify(content,null,2);
+      }
+
+      fse.outputFileSync(to, content)
+    }
+    
+    
+    return this.downloadPackage(tplCfg.package)
+    .then(templatePkg=>{
+      if (templatePkg){
+
+        let tplTypeRoot = path.resolve(templatePkg, 'templates', validType)
+        let commonTypeRoot = path.resolve(templatePkg, 'templates', 'common')
+
+        let commonFiles = glob.sync('**/*', { dot: true, cwd: commonTypeRoot });
+        let files = glob.sync('**/*', { dot: true, cwd: tplTypeRoot });
+
+        let length = commonFiles.concat(files).length;
+        let fileIndx = 1
+
+        commonFiles.forEach((f)=>{
+          
+          spinner.start(`[${++fileIndx}/${length}]generateing file: ${f}` )
+          renderFile(f, commonTypeRoot)
+
+        })
+        files.forEach((f)=>{
+          
+          spinner.start(`[${++fileIndx}/${length}]generateing file: ${f}` )
+          renderFile(f, tplTypeRoot)
+
+        })
+
+        spinner.succeed('Generated file successfully!')
+
+        return true
         
       }
 
+    })
+    .catch(err=>{
+      spinner.fail()
+      return false
     })
     
   }
@@ -219,8 +302,6 @@ module.exports = class Create{
     let registry = this.getRegistry();
 
     let url = `${registry}/${packageName}/latest`;
-
-    
 
     const getTarball = ()=>{
       return this.request(url)
@@ -233,34 +314,34 @@ module.exports = class Create{
         })
     }
 
-    const spinner = ora('downloading template').start();
     let tempdir = '';
+
+    spinner.start('downloading template');
     return getTarball()
     .then(tarball=>{
       // 下载失败
       if (!tarball){
-        spinner.fail('downloading template fail')
+        spinner.fail()
         throw new Error('download fail')
       }
 
-      spinner.succeed('downloading template succeed!')
+      spinner.succeed()
 
       tempdir = path.resolve(os.tmpdir(), 'tha-vue-create-config')
 
       shell.rm('-rf', tempdir);
-      
+      spinner.start('uncompress template')
       return compressing.tgz.uncompress(tarball, tempdir)
     })
     .then(done=>{
-      spinner.succeed('uncompress template succeed!')
+      spinner.succeed()
       
       return path.resolve(tempdir, 'package')
     })
     .catch(err=>{
-      console.log(err);
       
       if (err.message !== 'download fail'){
-        spinner.fail('uncompress template fail')
+        spinner.fail()
       }
 
       process.exit(1)
@@ -303,6 +384,25 @@ module.exports = class Create{
     .then(res=>{
       return res.data
     })
+  }
+
+  logUsage(){
+    let cd = '';
+
+    if (this.createMethod === 'init') cd = `cd ${path.basename(this.validDir)}`
+    console.log();
+    
+    console.log(`usage:
+  ${cd}
+  - npm i
+  - npm start
+
+  ------
+
+  other usage:
+    npm run list - list version of app libs
+    npm run update - update app libs
+    `)
   }
 
 

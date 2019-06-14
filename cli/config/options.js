@@ -44,6 +44,12 @@ let schema = {
         }
       }
 
+    },
+    compatibility: {
+      type: 'object',
+      propertyNames: {
+        level: 'number'
+      }
     }
   }
 }
@@ -57,10 +63,13 @@ let defaultOptions = {
   },
   appRoot: process.env.APP_ROOT ? path.resolve(process.cwd(),process.env.APP_ROOT) : process.cwd(),
   paths: paths,
-  // 定义客户端环境f
+  // 定义客户端环境
   clientEnv: envs.row,
   // 定义全局变量
   globalVar: {},
+  compatibility: {
+    level: 0
+  }
 }
 
 let cacheOptions = null;
@@ -134,6 +143,7 @@ function createOptions(){
 }
 
 let create = debounce.cache(1000, createOptions);
+
 
 create.inject = function (op) {
   defaultOptions = _.defaultsDeep({}, op, defaultOptions)

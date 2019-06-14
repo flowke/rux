@@ -3,7 +3,8 @@
 module.exports = (obj)=>{
   let val = {
     keys: [],
-    values: []
+    values: [],
+    raw: obj
   }
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const path = require('path')
-const Create = require('../cli/lib/vue-create');
+const Create = require('../init/vue-create');
 const toArr = require('../utils/toArr');
 
 require('@babel/register')( {
@@ -33,6 +33,7 @@ yargs
         choices: ['put', 'init']
       })
       .options({
+        
         type: {
           choices: tplCfg.keys,
           describe: tplCfg.values.reduce((acc, t)=>{

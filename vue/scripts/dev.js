@@ -14,7 +14,7 @@ dbugEntry('inject entry.')
 
 createOption.inject({
   paths: {
-    entryPoint: path.resolve(__dirname, '../../', '.entry.js')
+    entryPoint: path.resolve(createOption().appRoot, '.temp/.entry.js')
   }
 });
 
@@ -49,7 +49,7 @@ watchFile(createOption().appRoot, debounce.exec(500, (emitPath, pathKey) => {
 
 
 function emitFile(code, cb) {
-  fse.outputFile(path.resolve(__dirname, '../../', '.entry.js'), code, err => {
+  fse.outputFile(path.resolve(createOption().appRoot, '.temp/.entry.js'), code, err => {
     if (err) throw err;
 
     dbugEntry('entry generated')

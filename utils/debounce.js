@@ -18,7 +18,9 @@ exports.cache = function(interval, cb){
 
   let timerRunning = false;
 
-  return (...rest) => {
+  return (fresh, ...rest) => {
+
+    if (fresh) timerRunning = false;
 
     // 在休息中, 直接缓存并返回新值
     if (!timerRunning){

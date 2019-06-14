@@ -15,6 +15,7 @@ let {
   clientEnv,
   globalVar,
   paths,
+  compatibility
 } = options;
 
 
@@ -76,7 +77,10 @@ cfg.merge({
     alias: {
       '@': path.resolve(options.appRoot, 'src'),
       '@@': path.resolve(options.appRoot),
-    }
+    },
+    extensions: [
+      '.js', '.vue', '.json'
+    ]
   },
 
   module: {
@@ -98,11 +102,13 @@ cfg.merge({
           // only handle app src js
           js: {
             test: /\.(js)$/,
-            include: [paths.appSrc],
+            include: [paths.appSrc, /puta\/lib\/index/],
             use: {
               'babel':{
                 loader: require.resolve('babel-loader'),
-                options: babelConfig(),
+                options: babelConfig({
+                  compatibility
+                }),
               }
             },
             

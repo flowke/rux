@@ -8,7 +8,7 @@ const path = require('path');
 config.module
   .rule('handleRouter')
     .pre()
-    .test(path.resolve(options().appRoot, 'router/index.js'))
+  .test(/router\/index\.js$/)
     .use('router')
       .loader(require.resolve('./loader/vue-router-loader.js'))
       .end()

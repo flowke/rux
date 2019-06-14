@@ -1,15 +1,23 @@
 const path = require('path');
 
 module.exports = function (cfg={}) {
-  
+  let {
+    compatibility
+  } = cfg;
+
+  let {
+    level,
+    targets
+  } = compatibility
+
   return {
     cwd: path.resolve(__dirname, '../../'),
     presets: [
       ["@babel/preset-env",{
         modules: false,
-        useBuiltIns: 'usage',
-        corejs: 3,
-        ...cfg.env || {}
+        useBuiltIns: level ? 'usage': false,
+        corejs: level? level : undefined,
+        targets
       }]
     ],
 

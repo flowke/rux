@@ -8,8 +8,9 @@ const chalk = require('chalk')
 let dbug = require('debug')('vueServerStart:')
 
 module.exports = function () {
-  let options = createOption();
+  let options = createOption(true);
   let config = require('../config/vue.config.js').toConfig();
+  
 
   let server = new Server();
 
