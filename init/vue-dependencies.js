@@ -12,8 +12,6 @@ module.exports = {
   commonLibs: {
     vue: '^2.6.10',
     puta: 'latest',
-    'core-js': '2',
-    'core-js': '3',
     '@babel/runtime': 'latest'
   },
 

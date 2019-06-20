@@ -4,12 +4,14 @@ const chalk = require('chalk');
 const fse = require('fs-extra');
 const inquirer = require('inquirer');
 const toArr = require('../utils/toArr');
+const ordered = require('../utils/ordered');
 const request = require('axios');
 const shell = require('shelljs');
 const compressing = require('compressing');
 const os = require('os');
 const ora = require('ora');
 const swig = require('swig');
+
 
 const spinner = ora();
 
@@ -82,11 +84,58 @@ module.exports = class Create{
           let dir = path.basename(this.validDir)
           shell.cd(dir)
 
-        } 
+        }
 
-        spinner.start('install packsges...')
-        shell.exec(`npm i`, {silent: true},(code, stdout, stderr) => {
-          spinner.succeed()
+        let {
+          dependencies,
+          devDependencies
+        } = this.validLocals;
+
+        let dep = Object.keys(dependencies)
+        let devDep = Object.keys(devDependencies)
+
+        dep = dep.map(name=>{
+          return function(){
+            let p = new Promise(rv=>{
+              shell.exec(`npm i ${name}`, { silent: true }, (code, stdout, stderr) => {
+                rv(name)
+              })
+            })
+            p.info = name
+            return p
+          }
+          
+        })
+        devDep = devDep.map(name=>{
+          return function(){
+            let p = new Promise(rv=>{
+              shell.exec(`npm i -D ${name}`, { silent: true }, (code, stdout, stderr) => {
+                rv(name)
+              })
+            })
+            p.info = name
+            return p
+          }
+          
+        })
+
+        let all = dep.concat(devDep)
+
+        let i = 1;
+        let spin = ora({ spinner: 'point' })
+        spin.start(`start installation`)
+
+        ordered(all, {
+          paraller: true,
+          waitingEach:name=>{
+            spin.start(`[${i++}/${all.length}] install ${name}`)
+          },
+          afterEach: name=>{
+            
+            spin.succeed();
+          }
+        })
+        .then(()=>{
           this.logUsage()
         })
         
@@ -412,7 +461,7 @@ module.exports = class Create{
     }
     console.log();
     
-    console.log(`usage:
+    console.log(chalk.bold(`usage:
   ${cd}
   - npm i
   - npm start
@@ -422,7 +471,7 @@ module.exports = class Create{
   other usage:
     npm run list - list version of app libs
     npm run update - update app libs
-    `)
+    `))
   }
 
 
