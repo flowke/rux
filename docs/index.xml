@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Docs on Tha</title>
-    <link>flowke.github.io/tha/docs/</link>
+    <link>https://flowke.github.io/tha/docs/</link>
     <description>Recent content in Docs on Tha</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     
-	<atom:link href="flowke.github.io/tha/docs/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://flowke.github.io/tha/docs/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title></title>
-      <link>flowke.github.io/tha/docs/getting-started/config/</link>
+      <link>https://flowke.github.io/tha/docs/getting-started/config/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>flowke.github.io/tha/docs/getting-started/config/</guid>
+      <guid>https://flowke.github.io/tha/docs/getting-started/config/</guid>
       <description>通用配置项 项目的配置文件位于: config/config.js, 以下是一个示例:
 module.exports = { devServer: { port: 3006 }, clientEnv: { // access it with process.env.BUILD_TYPE BUILD_TYPE: &#39;test&#39; }, globalVar: { // access it with NAME NAME: &#39;Hue&#39; }, compatibility: { level: , //0,1,2 // targets config for browserslist // https://github.com/browserslist/browserslist targets: { &amp;quot;chrome&amp;quot;: &amp;quot;58&amp;quot;, &amp;quot;ie&amp;quot;: &amp;quot;11&amp;quot; } } }  以下配置是通用的:
 puta boolean, defaults: true
@@ -25,10 +25,10 @@ devServer  type: Object  此配置项内容等同于 webpack 的 devServer 的�
     
     <item>
       <title></title>
-      <link>flowke.github.io/tha/docs/vue/config/</link>
+      <link>https://flowke.github.io/tha/docs/vue/config/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>flowke.github.io/tha/docs/vue/config/</guid>
+      <guid>https://flowke.github.io/tha/docs/vue/config/</guid>
       <description>配置项 除了 通用配置项, vue 项目还支持以下配置项:
 router boolean, defaults: false
 是否在项目中启用路由. 详情请看
@@ -38,10 +38,10 @@ vuex boolean, defaults: false
     
     <item>
       <title>Commander</title>
-      <link>flowke.github.io/tha/docs/getting-started/command/</link>
+      <link>https://flowke.github.io/tha/docs/getting-started/command/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>flowke.github.io/tha/docs/getting-started/command/</guid>
+      <guid>https://flowke.github.io/tha/docs/getting-started/command/</guid>
       <description>命令行总览 tha 的前置命令只有两个: tha-r 和 tha-v, 分别针对 react 项目和 vue 项目的操作.
 位置参数都一样, 接下的所以接下来的部分将会以 tha-v 为例作为演示. 命令的详细内容到各种的板块查看.
 创建项目 &amp;ndash; init or put 你可以使用 tha-v init 或 tha-v put, 作为开始来创建项目
@@ -51,10 +51,10 @@ $ tha-v init ? type a directory name to init: ucs # 或者直接紧跟一个名�
     
     <item>
       <title>Introduction</title>
-      <link>flowke.github.io/tha/docs/getting-started/init-project/</link>
+      <link>https://flowke.github.io/tha/docs/getting-started/init-project/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>flowke.github.io/tha/docs/getting-started/init-project/</guid>
+      <guid>https://flowke.github.io/tha/docs/getting-started/init-project/</guid>
       <description>初始化项目 首先, 确保已经全局安装了 tha:
 $ npm i tha -g  接着你会得到两个预置命令: tha-r 和 tha-v, 分别针对 react 项目和 vue 项目的操作.
 我们以新建 vue 项目为例:
