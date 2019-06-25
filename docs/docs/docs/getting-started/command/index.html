@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  
+    
+    Commander
+  
+ | Tha</title>
+
+
+
+<link rel="stylesheet" href="/book.min.f4161f5e2de53a2e927f51df1611323a2a12cccb2681f23cb6fc3517852e8643.css">
+
+
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" style="display: none" id="menu-control" />
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
+<h2 class="book-brand">
+  <a href="http://example.org/">Tha</a>
+</h2>
+
+
+
+    
+  
+  
+  
+
+  <style>
+  nav ul a[href$="\2f docs\2fgetting-started\2f command\2f "] {
+      color: #004ed0;
+  }
+  </style>
+
+<ul>
+<li><p>快速上手</p>
+
+<ul>
+<li><a href="/docs/getting-started/init-project">初始化项目</a></li>
+<li><a href="/docs/getting-started/command">命令行总览</a></li>
+<li><a href="/docs/getting-started/config">通用配置项</a></li>
+</ul></li>
+
+<li><p><strong>Vue</strong></p></li>
+
+<li></li>
+
+<li><p><a href="/docs/vue/config">配置项</a></p></li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+
+    </aside>
+
+    <div class="book-page">
+      <header class="align-center justify-between book-header">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" alt="Menu" />
+  </label>
+  <strong>
+  
+    
+    Commander
+  
+</strong>
+</header>
+
+      
+<article class="markdown">
+
+<h1 id="命令行总览">命令行总览</h1>
+
+<p>tha 的前置命令只有两个: <code>tha-r</code> 和 <code>tha-v</code>, 分别针对 react 项目和 vue 项目的操作.</p>
+
+<p>位置参数都一样, 接下的所以接下来的部分将会以 <code>tha-v</code> 为例作为演示. 命令的详细内容到各种的板块查看.</p>
+
+<h2 id="创建项目-init-or-put">创建项目 &ndash; init or put</h2>
+
+<p>你可以使用 <code>tha-v init</code> 或 <code>tha-v put</code>, 作为开始来创建项目</p>
+
+<h3 id="init">init</h3>
+
+<pre><code class="language-bash">$ tha-v init
+</code></pre>
+
+<p>接着会被提示输入一个项目名字(你也可以在 init 后面紧跟一个名字), 查看如下示例:</p>
+
+<pre><code class="language-bash">$ tha-v init
+? type a directory name to init: ucs
+
+# 或者直接紧跟一个名字:
+# -f 参数用于 ucs 文件夹已经存在的情况, 会强制清空文件夹的内容
+
+$ tha-v init ucs -f
+</code></pre>
+
+<p><code>ucs</code> 在此处将会出现在两个地方: 作为之后项目 package.json 的 name; tha 会新建一个 <code>ucs</code> 的文件夹, 之后的项目的模板文件将会放进此处.</p>
+
+<p>在这个动作之后, 你会被提示选择一个项目模板, 你也可以使用 <code>--type=***</code> 来直接指定使用哪个模板: 查看如下示例:</p>
+
+<pre><code class="language-bash">$ tha-v init
+
+? type a directory name to init: ucs
+
+? please choose a template (Use arrow keys)
+❯ simple  template will only contain vue
+  router  template will contain vue+router
+  vuex  template will contain vue+vuex
+  router-vuex  template will contain vue+router+vuex
+
+或者直接指定模板:
+
+$ tha-v init ucs --type=simple
+</code></pre>
+
+<h3 id="put">put</h3>
+
+<p>put 和 init 大同小异, 不同的是 put 会跳过 &ldquo;输入一个项目名字&rdquo; 的阶段, 直接把当前文件夹当作项目名.</p>
+
+<h2 id="启动项目用于开发-dev">启动项目用于开发: dev</h2>
+
+<p>处理确保全局安装了 tha, 还必须确保在项目本地安装 tha, 使用如下命令便可以开启开发服务器:</p>
+
+<pre><code class="language-bash">$ tha-v dev
+</code></pre>
+
+<blockquote>
+<p>注: 和服务器相关的配置查看 <a href="/docs/getting-started/config/#devserver">配置项</a> 章节.</p>
+</blockquote>
+</article>
+
+      
+
+      
+    </div>
+
+    
+  
+
+  <aside class="book-toc level-6 fixed">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#命令行总览">命令行总览</a>
+<ul>
+<li><a href="#创建项目-init-or-put">创建项目 &ndash; init or put</a>
+<ul>
+<li><a href="#init">init</a></li>
+<li><a href="#put">put</a></li>
+</ul></li>
+<li><a href="#启动项目用于开发-dev">启动项目用于开发: dev</a></li>
+</ul></li>
+</ul>
+</nav>
+  </aside>
+
+
+
+  </main>
+  
+  
+  
+</body>
+
+</html>

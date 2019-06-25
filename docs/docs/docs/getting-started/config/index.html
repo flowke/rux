@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  
+    
+    Config
+  
+ | Tha</title>
+
+
+
+<link rel="stylesheet" href="/book.min.f4161f5e2de53a2e927f51df1611323a2a12cccb2681f23cb6fc3517852e8643.css">
+
+
+<link rel="icon" href="/favicon.png" type="image/x-icon">
+
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" style="display: none" id="menu-control" />
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
+<h2 class="book-brand">
+  <a href="http://example.org/">Tha</a>
+</h2>
+
+
+
+    
+  
+  
+  
+
+  <style>
+  nav ul a[href$="\2f docs\2fgetting-started\2f config\2f "] {
+      color: #004ed0;
+  }
+  </style>
+
+<ul>
+<li><p>快速上手</p>
+
+<ul>
+<li><a href="/docs/getting-started/init-project">初始化项目</a></li>
+<li><a href="/docs/getting-started/command">命令行总览</a></li>
+<li><a href="/docs/getting-started/config">通用配置项</a></li>
+</ul></li>
+
+<li><p><strong>Vue</strong></p></li>
+
+<li></li>
+
+<li><p><a href="/docs/vue/config">配置项</a></p></li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+
+    </aside>
+
+    <div class="book-page">
+      <header class="align-center justify-between book-header">
+  <label for="menu-control">
+    <img src="/svg/menu.svg" alt="Menu" />
+  </label>
+  <strong>
+  
+    
+    Config
+  
+</strong>
+</header>
+
+      
+<article class="markdown">
+
+<h1 id="通用配置项">通用配置项</h1>
+
+<p>项目的配置文件位于: <code>config/config.js</code>, 以下是一个示例:</p>
+
+<pre><code class="language-js">module.exports = {
+  devServer: {
+    port: 3006
+  },
+  clientEnv: {
+    // access it with process.env.BUILD_TYPE
+    BUILD_TYPE: 'test'
+  },
+  globalVar: {
+    // access it with NAME
+    NAME: 'Hue'
+  },
+  compatibility: {
+    level: , //0,1,2
+
+    // targets config for browserslist
+    // https://github.com/browserslist/browserslist
+    targets: {
+      &quot;chrome&quot;: &quot;58&quot;,
+      &quot;ie&quot;: &quot;11&quot;
+    }
+  }
+}
+</code></pre>
+
+<p>以下配置是通用的:</p>
+
+<h2 id="puta">puta</h2>
+
+<p><code>boolean, defaults: true</code></p>
+
+<p>是否内置 <a href="https://www.npmjs.com/package/puta"><code>puta</code></a> 用于请求.</p>
+
+<h2 id="devserver">devServer</h2>
+
+<ul>
+<li>type: <code>Object</code></li>
+</ul>
+
+<p>此配置项内容等同于 webpack 的 devServer 的配置内容. 如下配置会修改开发服务器的启动端口为4050:</p>
+
+<pre><code class="language-js">devServer: {
+  port: 4050
+},
+</code></pre>
+
+<h2 id="clientenv">clientEnv</h2>
+
+<ul>
+<li>type: <code>Object</code></li>
+</ul>
+
+<p>在项目可以通过 <code>process.env.xxx</code> 来访问 clientEnv 定义的内容:</p>
+
+<pre><code class="language-js">clientEnv: {
+  BUILD_TYPE: 'client'
+},
+</code></pre>
+
+<h2 id="globalvar">globalVar</h2>
+
+<ul>
+<li>type: <code>Object</code></li>
+</ul>
+
+<p>可以定义一些全局变量, 在项目中可以访问:</p>
+
+<pre><code class="language-js">globalVar: {
+  BUILD_TYPE: 'client'
+},
+</code></pre>
+
+<h2 id="compatibility">compatibility</h2>
+
+<ul>
+<li>type: <code>Object</code></li>
+</ul>
+
+<p>用于定义项目代码的兼容性, 查看如下说明:</p>
+
+<pre><code class="language-js">compatibility: {
+  level: , //0,1,2
+
+  // targets config for browserslist
+  // https://github.com/browserslist/browserslist
+  targets: {
+    &quot;chrome&quot;: &quot;58&quot;,
+    &quot;ie&quot;: &quot;11&quot;
+  }
+},
+</code></pre>
+
+<p><strong>level:</strong></p>
+
+<p>类型: <code>Number</code><br />
+可选值: 0,1,2<br />
+默认值: 0</p>
+
+<ul>
+<li>0 不进行 polyfill,</li>
+<li>1 进行 polyfill,</li>
+<li>2 polyfill 会包括实例属性, 例如: <code>&quot;foobar&quot;.includes(&quot;foo&quot;)</code></li>
+</ul>
+
+<p><strong>targets</strong></p>
+
+<p><code>string | Array&lt;string&gt; | { [string]: string }, defaults to {}.</code></p>
+
+<p>定义兼容的目标, 详情查看 <a href="https://github.com/browserslist/browserslist">https://github.com/browserslist/browserslist</a></p>
+
+<p>这决定了 babel 是否需要都某些代码进行 transform 和 polyfill.</p>
+</article>
+
+      
+
+      
+    </div>
+
+    
+  
+
+  <aside class="book-toc level-6 fixed">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#通用配置项">通用配置项</a>
+<ul>
+<li><a href="#puta">puta</a></li>
+<li><a href="#devserver">devServer</a></li>
+<li><a href="#clientenv">clientEnv</a></li>
+<li><a href="#globalvar">globalVar</a></li>
+<li><a href="#compatibility">compatibility</a></li>
+</ul></li>
+</ul>
+</nav>
+  </aside>
+
+
+
+  </main>
+  
+  
+  
+</body>
+
+</html>
