@@ -1,0 +1,7 @@
+baseURL = "http://example.org/"
+languageCode = "en-us"
+title = "Tha"
+theme = "book"
+
+[params]
+BookMenuBundle = "/menu"
