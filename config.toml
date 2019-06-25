@@ -1,7 +1,7 @@
-baseURL = "http://example.org/"
+baseURL = "flowke.github.io/tha/"
 languageCode = "en-us"
 title = "Tha"
 theme = "book"
-baseURL="flowke.github.io/tha"
+
 [params]
 BookMenuBundle = "/menu"
