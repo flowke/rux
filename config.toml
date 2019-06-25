@@ -1,4 +1,4 @@
-baseURL = "flowke.github.io/tha/"
+baseURL = "https://flowke.github.io/tha"
 languageCode = "en-us"
 title = "Tha"
 theme = "book"

@@ -63,4 +63,4 @@ put 和 init 大同小异, 不同的是 put 会跳过 "输入一个项目名字"
 $ tha-v dev
 ```
 
-> 注: 和服务器相关的配置查看 [配置项](/docs/getting-started/config/#devserver) 章节.
+> 注: 和服务器相关的配置查看 [配置项]({{< ref "/docs/getting-started/config#devserver" >}}) 章节.

@@ -1,7 +1,7 @@
 
 # 配置项
 
-除了 [通用配置项](/docs/getting-started/config), vue 项目还支持以下配置项:
+除了 [通用配置项]({{< ref "/docs/getting-started/config" >}}), vue 项目还支持以下配置项:
 
 ## router
 
