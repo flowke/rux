@@ -26,6 +26,6 @@ echo "Updating gh-pages branch"
 cd public && git add --all && git commit -m "Publishing to gh-pages (plsh.sh)"
 
 echo "Pushing to github"
-git push --all
+git push origin gh-pages
 
 cd ..
