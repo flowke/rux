@@ -12,9 +12,13 @@ let dbugEntry = require('debug')('emitEntry:')
 
 dbugEntry('inject entry.')
 
+let config = {
+  entry: createOption().showEntry ? path.resolve(createOption().appRoot, '.temp/.entry.js') : path.resolve(__dirname, '../../', '.temp/.entry.js')
+}
+
 createOption.inject({
   paths: {
-    entryPoint: path.resolve(createOption().appRoot, '.temp/.entry.js')
+    entryPoint: config.entry
   }
 });
 
@@ -48,9 +52,8 @@ watchFile(createOption().appRoot, debounce.exec(500, (emitPath, pathKey) => {
 
 }) )
 
-
 function emitFile(code, cb) {
-  fse.outputFile(path.resolve(createOption().appRoot, '.temp/.entry.js'), code, err => {
+  fse.outputFile(config.entry, code, err => {
     if (err) throw err;
 
     dbugEntry('entry generated')

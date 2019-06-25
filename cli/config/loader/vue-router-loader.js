@@ -3,7 +3,7 @@ const parser = require('@babel/parser');
 const genn = require('@babel/generator').default;
 const traverse = require('@babel/traverse').default;
 
-module.exports = function (source, map, meta) {
+module.exports = function (source, sm, meta) {
   this.sourceMap = true;
   let callback = this.async();
 
@@ -68,7 +68,7 @@ module.exports = function (source, map, meta) {
   })
 
 
-  let code = genn(ast).code;
+  let {code, map} = genn(ast);
   
   importTpl+=code;
 

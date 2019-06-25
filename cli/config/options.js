@@ -50,6 +50,9 @@ let schema = {
       propertyNames: {
         level: 'number'
       }
+    },
+    showEntry: {
+      type: 'boolean'
     }
   }
 }
@@ -69,10 +72,9 @@ let defaultOptions = {
   globalVar: {},
   compatibility: {
     level: 0
-  }
+  },
+  showEntry: false
 }
-
-let cacheOptions = null;
 
 function getUserOptions(root='./') {
   let options = {};
@@ -115,9 +117,6 @@ function handleGlobalVar(vars) {
 }
 
 function createOptions(){
-
-  if (cacheOptions)
-  cacheOptions
   
   let userOp = getUserOptions(defaultOptions.appRoot);
 

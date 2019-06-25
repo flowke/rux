@@ -8,6 +8,9 @@ const webpack = require('webpack');
 const babelConfig = require('./babel.config');
 const WebpackBuildNotifierPlugin = require('./plugin/notifier');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+const ora = require('ora');
+const chalk = require('chalk');
 
 const options = require('./options')();
 
@@ -257,19 +260,36 @@ cfg.merge({
       }
     }: {},
 
-    WebpackBuildNotifier: {
-      plugin: WebpackBuildNotifierPlugin,
-      args: [{
-        suppressSuccess: 'initial'
-      }]
+    FriendlyErrorsWebpackPlugin: {
+      plugin: FriendlyErrorsWebpackPlugin,
+      // args: [{
+       
+      // }]
     },
-    ProgressBarPlugin: {
-      plugin: ProgressBarPlugin,
-      args: [{
-        clear: false,
-        complete: '>'
-      }]
+    ProgressPlugin: {
+      plugin: function(){
+        let span = ora({ spinner: 'point' });
+        let hasStart = false;
+        return new webpack.ProgressPlugin((percent, msg) => {
+          let fixed = chalk.bold.green(`${(percent * 100).toFixed()}%`)
+          
+          if (percent == 1 || msg === 'after emitting'){
+            span.stop()
+            span.clear()
+            return;
+          }
+
+          if(hasStart){
+            span.text = fixed
+          }else{
+            hasStart = true;
+            span.start(fixed)
+          }
+
+        })
+      }
     },
+
 
   },
 
