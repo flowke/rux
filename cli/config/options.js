@@ -27,7 +27,18 @@ let schema = {
     },
     paths: {
       type: 'object',
-      '.*': { type: 'string' }
+      'entryPoint': { type: 'string' },
+      'outputPath': { type: 'string' },
+      'publicPath': { type: 'string' },
+      'appHtml': { type: 'string' },
+      'appSrc': { type: 'string' },
+      'assetsDir': { type: ['string', 'null'] },
+      'js': { type: ['string', 'array'] },
+      'css': { type: ['string', 'array'] },
+      'fonts': { type: ['string', 'array'] },
+      'img': { type: ['string', 'array'] },
+      'otherFiles': { type: ['string', 'array'] },
+      'patterns': { type: 'array' },
     },
     appRoot: {
       type: 'string',
@@ -93,15 +104,19 @@ function handlePaths(cwd, paths={}) {
 
   // 来着paths.js
   let filter = [
-    'publicPath'
+    'outputPath',
+    'appSrc',
+    'entryPoint',
+    'appHtml',
+
   ];
 
-  for (const name in paths) {
-    if (paths.hasOwnProperty(name) && !path.isAbsolute(paths[name]) && !filter.some(e => e === name) ) {
-      
+  filter.forEach(name=>{
+    if (paths.hasOwnProperty(name) && !path.isAbsolute(paths[name])) {
+
       paths[name] = path.resolve(cwd, paths[name]);
     }
-  }
+  })
 
   return paths;
 }
@@ -146,6 +161,10 @@ let create = debounce.cache(1000, createOptions);
 
 create.inject = function (op) {
   defaultOptions = _.defaultsDeep({}, op, defaultOptions)
+}
+
+create.update = ()=>{
+  create(true)
 }
 
 module.exports = create;

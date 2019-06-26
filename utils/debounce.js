@@ -12,7 +12,7 @@ exports.exec = function (interval, cb) {
   }
 }
 
-exports.cache = function(interval, cb){
+exports.cache = function(interval, fn){
 
   let cacheVal = undefined;
 
@@ -29,7 +29,7 @@ exports.cache = function(interval, cb){
         timerRunning = false;
       }, interval);
 
-      cacheVal = cb(...rest);
+      cacheVal = fn(...rest);
       return cacheVal;
     }else{
       return cacheVal

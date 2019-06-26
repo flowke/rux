@@ -25,6 +25,10 @@ yargs
     process.env.NODE_ENV = "development"
     require('../vue/scripts/dev')
   })
+  .command('build', 'build', {}, argv => {
+    process.env.NODE_ENV = "production"
+    require('../vue/scripts/build')
+  })
   .command('$0 <create-method> [dir]', 'create a project template into a directory with a template type', yargs=>{
 
     return yargs

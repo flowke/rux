@@ -11,6 +11,7 @@ const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const ora = require('ora');
 const chalk = require('chalk');
+const type = require('../../utils/type');
 
 const options = require('./options')();
 
@@ -31,6 +32,93 @@ const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 const lessRegex = /\.less$/;
 const lessModuleRegex = /\.module\.less$/;
+
+let {
+  assetsDir,
+  hash,
+  contentHash,
+  js,
+  css,
+  fonts,
+  img,
+  media,
+  otherFiles,
+  patterns
+} = paths
+
+// filenames
+
+assetsDir = assetsDir === null ? '' : assetsDir
+assetsDir = assetsDir.replace(/^\//, '')
+assetsDir = assetsDir.replace(/\/$/, '')
+if (assetsDir) assetsDir = assetsDir+'/'
+
+let hashPattern = rt(()=>{
+
+  if (contentHash === true) return '[contenthash:8]';
+
+  if (contentHash && type(contentHash, 'string')) return contentHash;
+
+  if (hash === true) return '[hash:8]'
+  if (hash && type(hash, 'string')) return hash
+
+  if (contentHash === false) return ''
+
+  return '[contenthash:8]'
+
+})
+
+let fileHash = hashPattern ? '[hash:8]' : '';
+
+let jsPath = js || `${assetsDir}js/[name].${hashPattern}`;
+jsPath = jsPath.replace(/(\.|\.js)$/, '')
+
+let cssPath = css || `${assetsDir}css/[name].${hashPattern}`;
+cssPath = cssPath.replace(/(\.|\.css)$/, '')
+
+let fontsPath = fonts || `${assetsDir}fonts/[name].${fileHash}`;
+fontsPath = fontsPath.replace(/(\.|(\.\[ext\]))$/, '')
+fontsPath+='.[ext]'
+
+let imgPath = img || `${assetsDir}img/[name].${fileHash}`;
+imgPath = imgPath.replace(/(\.|(\.\[ext\]))$/, '')
+imgPath += '.[ext]'
+
+let mediaPath = media || `${assetsDir}media/[name].${fileHash}`;
+mediaPath = mediaPath.replace(/(\.|(\.\[ext\]))$/, '')
+mediaPath += '.[ext]'
+
+let otherPath = otherFiles || `${assetsDir}other-files/[name].${fileHash}`;
+otherPath = otherPath.replace(/(\.|(\.\[ext\]))$/, '')
+otherPath += '.[ext]'
+
+let patternsPath = patterns.reduce((acc, item, i)=>{
+
+  let test = [];
+
+  if (type(item[0], 'array')){
+    test = test.concat(item[0])
+  }else{
+    test.push(item[0])
+  }
+
+  acc[i] = {
+    test,
+    loader: require.resolve('file-loader'),
+    options: {
+      name: item[1],
+    },
+  }
+  return acc
+},{})
+
+console.log(patternsPath);
+
+
+function rt(cb){
+  return cb && cb()
+}
+
 
 let getStyleLoaders = (cssOptions, preLoader={}) => {
   let loaders = {
@@ -69,10 +157,10 @@ cfg.merge({
     path: paths.outputPath,
     publicPath: paths.publicPath,
     filename: isProdMode
-      ? '[name].[contenthash:8].js'
+      ? jsPath+'.js'
       : 'bundle.js',
     chunkFilename: isProdMode
-      ? '[name].[contenthash:8].chunk.js'
+      ? jsPath+'.chunk.js'
       : '[name].chunk.js',
   },
 
@@ -98,9 +186,26 @@ cfg.merge({
             loader: require.resolve('url-loader'),
             options: {
               limit: 10000,
-              name: 'static/media/[name].[hash:8].[ext]',
+              name: imgPath,
             },
           },
+          fonts: {
+            test: [/\.(ttf|eot|woff|woff2)$/],
+            loader: require.resolve('file-loader'),
+            options: {
+              name: fontsPath,
+            },
+          },
+          media: {
+            test: [/\.(mp3|mp4)$/],
+            loader: require.resolve('file-loader'),
+            options: {
+              name: mediaPath,
+            },
+          },
+
+          ...patternsPath,
+
           // name: babel
           // only handle app src js
           js: {
@@ -202,11 +307,18 @@ cfg.merge({
             loader: require.resolve('file-loader'),
             exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
             options: {
-              name: 'static/media/[name].[hash:8].[ext]',
+              name: otherPath,
             },
           }
         }
       }
+    }
+  },
+
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      automaticNameDelimiter: '.'
     }
   },
 
@@ -254,17 +366,14 @@ cfg.merge({
       MiniCssExtractPlugin: {
         plugin: MiniCssExtractPlugin,
         args: [{
-          filename: 'static/css/[name].[contenthash:8].css',
-          chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
+          filename: cssPath+'.css',
+          chunkFilename: cssPath+'.chunk.css',
         }]
       }
     }: {},
 
     FriendlyErrorsWebpackPlugin: {
-      plugin: FriendlyErrorsWebpackPlugin,
-      // args: [{
-       
-      // }]
+      plugin: FriendlyErrorsWebpackPlugin
     },
     ProgressPlugin: {
       plugin: function(){

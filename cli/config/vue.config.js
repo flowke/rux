@@ -1,8 +1,6 @@
 const config = require('./config.js');
 const merge = require('../../internal/mergeDeep');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const options = require('./options');
-const path = require('path');
 
 
 config.module
