@@ -115,13 +115,29 @@ https://github.com/alex-shpak/hugo-book
   },
   compatibility: {
     level: , //0,1,2
-
     // targets config for browserslist
     // https://github.com/browserslist/browserslist
     targets: {
       &quot;chrome&quot;: &quot;58&quot;,
       &quot;ie&quot;: &quot;11&quot;
     }
+  },
+  paths: {
+    outputPath: './dist',
+    publicPath: '',
+    // 单页的 html 模板
+    appHtml: './src/index.html',
+    //  app 文件夹
+    assetsDir: 'static',
+    hash: false,
+    contentHash: true,
+    js: '',
+    css: '',
+    fonts: '',
+    img: '',
+    media: '',
+    'otherFiles': '',
+    patterns: []
   }
 }
 </code></pre>
@@ -142,10 +158,224 @@ https://github.com/alex-shpak/hugo-book
 
 <p>此配置项内容等同于 webpack 的 devServer 的配置内容. 如下配置会修改开发服务器的启动端口为4050:</p>
 
+<p>参考: <a href="https://webpack.js.org/configuration/dev-server/">devServer</a></p>
+
 <pre><code class="language-js">devServer: {
   port: 4050
 },
 </code></pre>
+
+<h2 id="paths">paths</h2>
+
+<p><code>object, defaults: {}</code></p>
+
+<p>此配置项用于 配置和文件路径相关的选项, 例如 输出目录, 文件位置等等.</p>
+
+<p>以下是一个配置项示例:</p>
+
+<pre><code class="language-js">{
+  paths: {
+    outputPath: './dist',
+    publicPath: '',
+    // 单页的 html 模板
+    appHtml: './src/index.html',
+    //  app 文件夹
+
+    assetsDir: 'static',
+    hash: false,
+    contentHash: true,
+    js: '',
+    css: '',
+    fonts: '',
+    img: '',
+    media: '',
+    'otherFiles': '',
+    patterns: []
+  }
+}
+
+
+</code></pre>
+
+<h3 id="paths-outputpath">paths.outputPath</h3>
+
+<p><code>string, default: 'dist'</code></p>
+
+<p>相当于定义 webpack 配置的 output.path, 此处可以是相对路径或绝对路径.</p>
+
+<h3 id="paths-publicpath">paths.publicPath</h3>
+
+<p><code>string, default: ''</code></p>
+
+<p>相当于定义 webpack 配置的 output.publicPath.</p>
+
+<h3 id="paths-apphtml">paths.appHtml</h3>
+
+<p><code>string, default: './src/index.html'</code></p>
+
+<p>相当于定义 html-webpack-plugin<code>的 template</code>.</p>
+
+<h3 id="paths-assetsdir">paths.assetsDir</h3>
+
+<p><code>string, default: 'static'</code></p>
+
+<p>放置生成的静态资源 (js、css、img、fonts) 的 (相对于 outputPath 的) 目录。</p>
+
+<h3 id="paths-contenthash">paths.contentHash</h3>
+
+<p><code>string / boolean, default: true</code></p>
+
+<p>配置 输出文件名的 contentHash 格式,</p>
+
+<ul>
+<li>false 为不生成 contenthash.<br /></li>
+<li>true 为 &ldquo;[contenthash:8]&rdquo;</li>
+<li>string, 自定义 contenthash 的格式, 参考: <a href="https://webpack.js.org/configuration/output/#outputfilename">webpack output.filename</a></li>
+</ul>
+
+<h3 id="paths-hash">paths.hash</h3>
+
+<p><code>string / boolean, default: false</code></p>
+
+<p>配置 输出文件名的 hash 格式, <strong>只在 contentHash 为 false 时生效</strong>.</p>
+
+<ul>
+<li>false 为不生成 hash.<br /></li>
+<li>true 为 &ldquo;[hash:8]&rdquo;</li>
+<li>string, 自定义 contenthash 的格式, 参考: <a href="https://webpack.js.org/configuration/output/#outputfilename">webpack output.filename</a></li>
+</ul>
+
+<h3 id="paths-js">paths.js</h3>
+
+<p><code>string, default: ''</code></p>
+
+<p>定义 js 文件的输出.</p>
+
+<p>值示例: <code>static/js/[name].[contenthash:8].js</code></p>
+
+<p>相当于配置 webpack 的 output.filename 和 output.chunkFilename. 对此配置有影响.</p>
+
+<p>string 的格式符合 webpack output.filename 的格式, 不过此处设置的 .js 后缀会被忽略.</p>
+
+<p>假定值为: <code>'static/js/[name].[contenthash:8].js'</code>, 对 webpack 产生的影响如下:</p>
+
+<pre><code class="language-js">{
+  output: {
+    filename: 'static/css/[name].[contenthash:8].css',
+    chunkFilename: 'static/css/[name].[contenthash:8].[id].chunk.css',
+  }
+}
+
+</code></pre>
+
+<p>参考: <a href="https://webpack.js.org/configuration/output/#outputfilename">webpack output.filename</a></p>
+
+<blockquote>
+<p>此配置会忽略 assetsDir, hash , contenthash 配置</p>
+</blockquote>
+
+<h3 id="paths-css">paths.css</h3>
+
+<p><code>string, default: ''</code></p>
+
+<p>定义 css 文件的输出.</p>
+
+<p>值示例: <code>static/css/[name].[contenthash:8].css</code></p>
+
+<p>相当于配置 <a href="https://github.com/webpack-contrib/mini-css-extract-plugin">mini-css-extract-plugin</a> 的 filename 和 chunkFilename</p>
+
+<p>string 的格式符合 mini-css-extract-plugin option.filename 的格式, 不过此处设置的 .css 后缀会被忽略.</p>
+
+<p>假定值为: <code>'static/js/[name].[contenthash:8].css'</code>, 对mini-css-extract-plugin影响如下:</p>
+
+<pre><code class="language-js">{
+  filename: 'static/js/[name].[contenthash:8].js',
+  chunkFilename: 'static/js/[name].[contenthash:8].[id].chunk.js',
+}
+
+</code></pre>
+
+<p>参考: <a href="https://github.com/webpack-contrib/mini-css-extract-plugin">mini-css-extract-plugin</a></p>
+
+<blockquote>
+<p>此配置会忽略 assetsDir, hash , contenthash 配置</p>
+</blockquote>
+
+<h3 id="paths-img">paths.img</h3>
+
+<p><code>string, default: ''</code></p>
+
+<p>值示例: <code>static/img/[name].[contenthash:8].[ext]</code></p>
+
+<p>定义图片文件的输出位置, 影响的文件为: <code>.bmp, .gif, .jpg, .jpeg, .png</code></p>
+
+<blockquote>
+<p>此配置会忽略 assetsDir, hash , contenthash 配置</p>
+</blockquote>
+
+<h3 id="paths-fonts">paths.fonts</h3>
+
+<p><code>string, default: ''</code></p>
+
+<p>值示例: <code>static/fonts/[name].[contenthash:8].[ext]</code></p>
+
+<p>定义字体文件的输出位置, 影响的文件为: <code>.ttf, .eot, .woff, .woff2</code></p>
+
+<blockquote>
+<p>此配置会忽略 assetsDir, hash , contenthash 配置</p>
+</blockquote>
+
+<h3 id="paths-media">paths.media</h3>
+
+<p><code>string, default: ''</code></p>
+
+<p>值示例: <code>static/media/[name].[contenthash:8].[ext]</code></p>
+
+<p>定义音频视频文件的输出位置, 影响的文件为: <code>.avi、.mpeg、.mp4、.mov、.mkv、.wmv、.flv、.rmvb、.webm, .mp3, .ogg, .wav</code></p>
+
+<blockquote>
+<p>此配置会忽略 assetsDir, hash , contenthash 配置</p>
+</blockquote>
+
+<h3 id="paths-otherfiles">paths.otherFiles</h3>
+
+<p><code>string, default: ''</code></p>
+
+<p>值示例: <code>static/other-files/[name].[contenthash:8].[ext]</code></p>
+
+<p>定义其它 <strong>未在以上标明的文件</strong> 的输出位置, 例如 <code>ab.abc</code> 文件后缀名未在以上识别, 打包出来的文件将放在 static/other-files/ 文件夹下.</p>
+
+<blockquote>
+<p>此配置会忽略 assetsDir, hash , contenthash 配置</p>
+</blockquote>
+
+<h3 id="paths-patterns">paths.patterns</h3>
+
+<p><code>array&lt; array&lt;array|string|regexp, string&gt; &gt;, default: []</code></p>
+
+<p>patterns 是一个数组, 每一个元素也是一个数组,</p>
+
+<p>值示例:</p>
+
+<pre><code class="language-js">[
+  // 第一个元素 为匹配条件, 可以是 array, string, regexp
+  // 第二个元素是文件位置
+  [/\.abc$/, 'static/abc/[name].[hash].[ext]'],
+  [[/\.aaa$/, /\.bbb$/], 'static/abab/[name].[hash].[ext]'],
+]
+
+</code></pre>
+
+<p>在以上示例的情况下,</p>
+
+<ul>
+<li><code>.abc</code> 后缀的文件将放在 <code>static/abc/</code> 文件夹下,<br /></li>
+<li><code>.aaa, .bbb</code> 后缀的文件将放在 <code>static/abab</code> 文件夹下</li>
+</ul>
+
+<h3 id="注意-key-key">注意 :key::key:</h3>
+
+<p>paths 的 img, fonts, media, otherFiles, patterns, 的文件名需符合 <a href="https://github.com/webpack-contrib/file-loader#name">file-loader option.name</a> 的要求, 参考: <a href="https://github.com/webpack-contrib/file-loader#name">file-loader</a></p>
 
 <h2 id="clientenv">clientEnv</h2>
 
@@ -229,6 +459,23 @@ https://github.com/alex-shpak/hugo-book
 <ul>
 <li><a href="#puta">puta</a></li>
 <li><a href="#devserver">devServer</a></li>
+<li><a href="#paths">paths</a>
+<ul>
+<li><a href="#paths-outputpath">paths.outputPath</a></li>
+<li><a href="#paths-publicpath">paths.publicPath</a></li>
+<li><a href="#paths-apphtml">paths.appHtml</a></li>
+<li><a href="#paths-assetsdir">paths.assetsDir</a></li>
+<li><a href="#paths-contenthash">paths.contentHash</a></li>
+<li><a href="#paths-hash">paths.hash</a></li>
+<li><a href="#paths-js">paths.js</a></li>
+<li><a href="#paths-css">paths.css</a></li>
+<li><a href="#paths-img">paths.img</a></li>
+<li><a href="#paths-fonts">paths.fonts</a></li>
+<li><a href="#paths-media">paths.media</a></li>
+<li><a href="#paths-otherfiles">paths.otherFiles</a></li>
+<li><a href="#paths-patterns">paths.patterns</a></li>
+<li><a href="#注意-key-key">注意 :key::key:</a></li>
+</ul></li>
 <li><a href="#clientenv">clientEnv</a></li>
 <li><a href="#globalvar">globalVar</a></li>
 <li><a href="#compatibility">compatibility</a></li>

@@ -17,10 +17,7 @@
       
       <guid>https://flowke.github.io/tha/docs/getting-started/config/</guid>
       <description>通用配置项 项目的配置文件位于: config/config.js, 以下是一个示例:
-module.exports = { devServer: { port: 3006 }, clientEnv: { // access it with process.env.BUILD_TYPE BUILD_TYPE: &#39;test&#39; }, globalVar: { // access it with NAME NAME: &#39;Hue&#39; }, compatibility: { level: , //0,1,2 // targets config for browserslist // https://github.com/browserslist/browserslist targets: { &amp;quot;chrome&amp;quot;: &amp;quot;58&amp;quot;, &amp;quot;ie&amp;quot;: &amp;quot;11&amp;quot; } } }  以下配置是通用的:
-puta boolean, defaults: true
-是否内置 puta 用于请求.
-devServer  type: Object  此配置项内容等同于 webpack 的 devServer 的配置内容.</description>
+module.exports = { devServer: { port: 3006 }, clientEnv: { // access it with process.env.BUILD_TYPE BUILD_TYPE: &#39;test&#39; }, globalVar: { // access it with NAME NAME: &#39;Hue&#39; }, compatibility: { level: , //0,1,2 // targets config for browserslist // https://github.com/browserslist/browserslist targets: { &amp;quot;chrome&amp;quot;: &amp;quot;58&amp;quot;, &amp;quot;ie&amp;quot;: &amp;quot;11&amp;quot; } }, paths: { outputPath: &#39;./dist&#39;, publicPath: &#39;&#39;, // 单页的 html 模板 appHtml: &#39;./src/index.html&#39;, // app 文件夹 assetsDir: &#39;static&#39;, hash: false, contentHash: true, js: &#39;&#39;, css: &#39;&#39;, fonts: &#39;&#39;, img: &#39;&#39;, media: &#39;&#39;, &#39;otherFiles&#39;: &#39;&#39;, patterns: [] } }  以下配置是通用的:</description>
     </item>
     
     <item>
