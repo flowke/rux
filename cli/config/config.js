@@ -139,7 +139,7 @@ cfg.merge({
       ? jsPath+'.js'
       : 'bundle.js',
     chunkFilename: isProdMode
-      ? jsPath+'.chunk.js'
+      ? jsPath+'.[id].chunk.js'
       : '[name].chunk.js',
   },
 
@@ -161,7 +161,7 @@ cfg.merge({
         oneOf: {
           // name: image, 
           image: {
-            test: /\.(bmp|gif|jpe?g|png)$/,
+            test: /\.(bmp|gif|jpe?g|png|svg)$/,
             loader: require.resolve('url-loader'),
             options: {
               limit: 10000,
@@ -176,7 +176,7 @@ cfg.merge({
             },
           },
           media: {
-            test: /\.(mp3|mp4)$/,
+            test: /\.(mp3|ogg|wav|avi|mpeg|mov|mkv|wmv|flv|rmvb|webm|mp4)$/,
             loader: require.resolve('file-loader'),
             options: {
               name: mediaPath,
@@ -344,7 +344,7 @@ cfg.merge({
         plugin: MiniCssExtractPlugin,
         args: [{
           filename: cssPath+'.css',
-          chunkFilename: cssPath+'.chunk.css',
+          chunkFilename: cssPath+'.[id].chunk.css',
         }]
       }
     }: {},
