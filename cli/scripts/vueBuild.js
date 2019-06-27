@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 const rimraf = require('rimraf');
 const creageOP = require('../config/options');
-
+const fs = require('fs');
 module.exports = function(cb){
   let config = require('../config/vue.config.js').toConfig();
   

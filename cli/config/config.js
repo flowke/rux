@@ -48,6 +48,8 @@ let {
 
 // filenames
 
+
+
 assetsDir = assetsDir === null ? '' : assetsDir
 assetsDir = assetsDir.replace(/^\//, '')
 assetsDir = assetsDir.replace(/\/$/, '')
@@ -91,29 +93,6 @@ mediaPath += '.[ext]'
 let otherPath = otherFiles || `${assetsDir}other-files/[name].${fileHash}`;
 otherPath = otherPath.replace(/(\.|(\.\[ext\]))$/, '')
 otherPath += '.[ext]'
-
-let patternsPath = patterns.reduce((acc, item, i)=>{
-
-  let test = [];
-
-  if (type(item[0], 'array')){
-    test = test.concat(item[0])
-  }else{
-    test.push(item[0])
-  }
-
-  acc[i] = {
-    test,
-    loader: require.resolve('file-loader'),
-    options: {
-      name: item[1],
-    },
-  }
-  return acc
-},{})
-
-console.log(patternsPath);
-
 
 function rt(cb){
   return cb && cb()
@@ -182,7 +161,7 @@ cfg.merge({
         oneOf: {
           // name: image, 
           image: {
-            test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+            test: /\.(bmp|gif|jpe?g|png)$/,
             loader: require.resolve('url-loader'),
             options: {
               limit: 10000,
@@ -190,21 +169,19 @@ cfg.merge({
             },
           },
           fonts: {
-            test: [/\.(ttf|eot|woff|woff2)$/],
+            test: /\.(ttf|eot|woff|woff2)$/,
             loader: require.resolve('file-loader'),
             options: {
               name: fontsPath,
             },
           },
           media: {
-            test: [/\.(mp3|mp4)$/],
+            test: /\.(mp3|mp4)$/,
             loader: require.resolve('file-loader'),
             options: {
               name: mediaPath,
             },
           },
-
-          ...patternsPath,
 
           // name: babel
           // only handle app src js
@@ -412,6 +389,28 @@ cfg.merge({
   }
 
 })
+
+patterns.forEach((item, i) => {
+
+  let test = [];
+
+  if (type(item[0], 'array')) {
+    test = test.concat(item[0])
+  } else {
+    test.push(item[0])
+  }
+
+  cfg.module.rule('baseLoaders').oneOf(i)
+    .test(test)
+    .use('file')
+      .loader(require.resolve('file-loader'))
+      .options({ name: item[1]})
+      .end()
+    .before('fileCallBack')
+
+ 
+})
+
 
 
 

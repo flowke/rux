@@ -1,6 +1,6 @@
 const Ajv = require('ajv');
 const path = require('path');
-
+const chalk = require('chalk');
 let ajv = new Ajv({ 
   allErrors: true,
   jsonPointers: true
@@ -31,8 +31,20 @@ module.exports = (schema, data, cb )=>{
   }else{
     if(!valid) {
       let {dataPath, message} = ajv.errors[0];
-      
-      throw new Error(message)
+
+      let head = ''
+
+      if (typeof cb === 'string') head= cb
+
+      dataPath = dataPath.replace(/\//g, '.')
+
+      console.log();
+
+      console.log(chalk.bold.red((head+' errors:\n').toUpperCase()));
+      console.log(chalk.bold.red(head + dataPath + '  ' + message));
+      console.log();
+
+      process.exit()
     }
     return true;
   }

@@ -27,18 +27,32 @@ let schema = {
     },
     paths: {
       type: 'object',
-      'entryPoint': { type: 'string' },
-      'outputPath': { type: 'string' },
-      'publicPath': { type: 'string' },
-      'appHtml': { type: 'string' },
-      'appSrc': { type: 'string' },
-      'assetsDir': { type: ['string', 'null'] },
-      'js': { type: ['string', 'array'] },
-      'css': { type: ['string', 'array'] },
-      'fonts': { type: ['string', 'array'] },
-      'img': { type: ['string', 'array'] },
-      'otherFiles': { type: ['string', 'array'] },
-      'patterns': { type: 'array' },
+      properties: {
+        'entryPoint': { type: 'string' },
+        'outputPath': { type: 'string' },
+        'publicPath': { type: 'string' },
+        'appHtml': { type: 'string' },
+        'appSrc': { type: 'string' },
+        'assetsDir': { type: ['string', 'null'] },
+        'js': { type: ['string', 'array'] },
+        'css': { type: ['string', 'array'] },
+        'fonts': { type: ['string', 'array'] },
+        'img': { type: ['string', 'array'] },
+        'otherFiles': { type: ['string', 'array'] },
+        'patterns': {
+          type: 'array',
+          items: {
+            type: "array",
+            maxItems: 2,
+            minItems: 2,
+            items: [
+              { "type": ['string', 'array', 'object'] },
+              {type: 'string'}
+            ],
+          }
+        },
+      }
+      
     },
     appRoot: {
       type: 'string',
@@ -135,14 +149,7 @@ function createOptions(){
   
   let userOp = getUserOptions(defaultOptions.appRoot);
 
-  validator(schema, userOp , err=>{
-    
-    if (err) {
-
-      let key = err.params.errors[0].params.additionalProperty;
-      throw new Error(err.message + chalk.bold.red(` property: ${key}`));
-    }
-  });
+  validator(schema, userOp, 'config');
 
   let thaOp = _.defaultsDeep(userOp, defaultOptions);
   validator(schema, thaOp);
@@ -150,7 +157,7 @@ function createOptions(){
   thaOp.paths = handlePaths(thaOp.appRoot, thaOp.paths);
   thaOp.globalVar = handleGlobalVar(thaOp.globalVar);
 
-  validator(schema, thaOp);
+  validator(schema, thaOp, 'config');
 
   
   return thaOp;
