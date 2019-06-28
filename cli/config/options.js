@@ -4,7 +4,6 @@ const fse = require('fs-extra');
 const path = require('path');
 const paths = require('./paths');
 const envs = require('./env');
-const chalk = require('chalk');
 const debounce = require('../../utils/debounce');
 
 let schema = {
@@ -78,6 +77,17 @@ let schema = {
     },
     showEntry: {
       type: 'boolean'
+    },
+    webpackChain: {
+      cusType: 'function',
+      errorMessage: 'should be function'
+    },
+    webpack: {
+      anyOf: [
+        { cusType: 'object'},
+        { cusType: 'function'},
+      ],
+      errorMessage: 'should be function or object'
     }
   }
 }
@@ -98,7 +108,8 @@ let defaultOptions = {
   compatibility: {
     level: 0
   },
-  showEntry: false
+  showEntry: false,
+  webpackChain: f=>f,
 }
 
 function getUserOptions(root='./') {

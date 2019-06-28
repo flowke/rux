@@ -78,6 +78,7 @@
     "webpack-build-notifier": "^1.0.3",
     "webpack-chain": "^5.2.4",
     "webpack-dev-server": "^3.7.2",
+    "webpack-merge": "^4.2.1",
     "yargs": "^13.2.4"
   },
   "devDependencies": {

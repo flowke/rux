@@ -7,7 +7,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const webpack = require('webpack');
 const babelConfig = require('./babel.config');
 const WebpackBuildNotifierPlugin = require('./plugin/notifier');
-const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 const ora = require('ora');
 const chalk = require('chalk');

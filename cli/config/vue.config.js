@@ -1,7 +1,10 @@
 const config = require('./config.js');
 const merge = require('../../internal/mergeDeep');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const wpkMerge = require('webpack-merge');
+const type = require('../../utils/type');
 
+const options = require('./options')();
 
 config.module
   .rule('handleRouter')
@@ -43,4 +46,18 @@ config.merge({
   }
 })
 
-module.exports = config;
+options.webpackChain(config);
+
+let cfg = config.toConfig();
+
+if(type(options.webpack, 'object')){
+  cfg = wpkMerge(cfg, options.webpack)
+}
+
+if(type(options.webpack, 'function')){
+  let out = options.webpack(config, wpkMerge)
+
+  if(type(out, 'object')) cfg = out;
+}
+
+module.exports = cfg;

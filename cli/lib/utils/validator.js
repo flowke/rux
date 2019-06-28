@@ -1,11 +1,11 @@
 const Ajv = require('ajv');
 const path = require('path');
 const chalk = require('chalk');
+const type = require('../../../utils/type');
 let ajv = new Ajv({ 
   allErrors: true,
   jsonPointers: true
 });
-require('ajv-errors')(ajv, { singleError: false});
 
 // https://github.com/epoberezkin/ajv/blob/master/CUSTOM.md#schema-compilation-context
 ajv.addKeyword('absolutePath', {
@@ -16,10 +16,25 @@ ajv.addKeyword('absolutePath', {
     }else{
       return true;
     }
-
   },
   errors: true
 })
+
+ajv.addKeyword('cusType', {
+  metaSchema: {
+    type: 'string'
+  },
+  compile: function (schema, str) {
+
+    return function(data){
+      return type(data, schema)
+    }
+
+  },
+  errors: false
+})
+
+require('ajv-errors')(ajv, { singleError: true });
 
 // 验证器
 module.exports = (schema, data, cb )=>{
