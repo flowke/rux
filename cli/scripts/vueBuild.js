@@ -3,10 +3,11 @@ const rimraf = require('rimraf');
 const creageOP = require('../config/options');
 const fs = require('fs');
 module.exports = function(cb){
-  let config = require('../config/vue.config.js').toConfig();
+  let config = require('../config/vue.config.js');
   
   rimraf.sync(creageOP().paths.outputPath+ '/*')
-
+  console.log(config.module.rules[0]);
+  
   webpack(config,(err, stats)=>{
     // if (err) {
     //   console.error(err.stack || err);

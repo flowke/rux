@@ -11,7 +11,7 @@ let dbug = require('debug')('vueServerStart:')
 
 module.exports = function () {
   let options = createOption(true);
-  let config = require('../config/vue.config.js').toConfig();
+  let config = require('../config/vue.config.js');
   
 
   let server = new Server();

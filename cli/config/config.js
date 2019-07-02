@@ -411,6 +411,70 @@ patterns.forEach((item, i) => {
 })
 
 
+class Inject{
+  constructor(){
+    this.before = [];
+    this.post = [];
+    this.injection = [];
+  }
 
+  add(cb, flag ='injection'){
+    let cachingArr = this.injection;
+    if (flag === 'before') cachingArr = this.before;
+    if (flag === 'post') cachingArr = this.post;
 
-module.exports = cfg;
+    cb && cachingArr.push(cb)
+  }
+
+  getCaching(){
+    return this.before.concat(this.injection, this.post)
+  }
+
+}
+
+let injection = new Inject
+
+// the exports
+
+function create() {
+  injection.getCaching().forEach(e=>{
+
+    e(cfg)
+  })
+
+  return cfg.toConfig()
+}
+
+create.add = injection.add.bind(injection)
+create.config = cfg
+
+create.html = {
+  add: (name,op={})=>{
+
+    injection.add(chain=>{
+      chain.plugin(name)
+        .use(HtmlWebpackPlugin, [{
+          template: paths.appHtml,
+          ...isProdMode ? {
+            minify: {
+              removeComments: true,
+              collapseWhitespace: true,
+              removeRedundantAttributes: true,
+              useShortDoctype: true,
+              removeEmptyAttributes: true,
+              removeStyleLinkTypeAttributes: true,
+              keepClosingSlash: true,
+              minifyJS: true,
+              minifyCSS: true,
+              minifyURLs: true,
+            },
+            minify: false
+          } : {},
+          ...op
+        }])
+    })
+
+  },
+}
+
+module.exports = create;

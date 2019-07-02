@@ -6,7 +6,7 @@ const type = require('../../utils/type');
 
 const options = require('./options')();
 
-config.module
+config.config.module
   .rule('handleRouter')
     .pre()
   .test(/router\/index\.js$/)
@@ -38,7 +38,7 @@ config.module
     .use('vueLoader')
       .loader(require.resolve('vue-loader'))
 
-config.merge({
+config.config.merge({
   plugin: {
     VueLoaderPlugin: {
       plugin: VueLoaderPlugin
@@ -46,18 +46,23 @@ config.merge({
   }
 })
 
-options.webpackChain(config);
+if (options.webpackChain) config.add(options.webpackChain)
 
-let cfg = config.toConfig();
+
+let cfg = config();
 
 if(type(options.webpack, 'object')){
   cfg = wpkMerge(cfg, options.webpack)
 }
 
 if(type(options.webpack, 'function')){
-  let out = options.webpack(config, wpkMerge)
+  let out = options.webpack(cfg, wpkMerge)
 
   if(type(out, 'object')) cfg = out;
 }
+
+// console.log(cfg.module.rules[0].oneOf, 'entry');
+// console.log(cfg.plugins, 'entry');
+
 
 module.exports = cfg;

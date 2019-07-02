@@ -16,6 +16,6 @@ module.exports = {
   fonts: '',
   img: '',
   media: '',
-  'otherFiles': '',
+  otherFiles: '',
   patterns: []
 }

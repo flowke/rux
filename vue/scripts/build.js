@@ -1,11 +1,12 @@
 const build = require('../../cli/scripts/vueBuild');
-
+// const path = require('path');
 const emitEntry = require('../lib/emitEntry');
-const createOption = require('../../cli/config/options');
+// const op = require('../../cli/config/options');
+
+// const rimraf = require('rimraf');
 
 emitEntry()
 .then(()=>{
-  createOption.update()
   build()
 })
 
