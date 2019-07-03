@@ -19,7 +19,8 @@ let {
   globalVar,
   paths,
   compatibility,
-  multiPages
+  multiPages,
+  splitRuntime
 } = options;
 
 
@@ -406,9 +407,18 @@ if (isProdMode){
 
 // add plugin
 
-if (multiPages===true){
+if (splitRuntime===true){
   cfg.optimization
     .runtimeChunk('single')
+}
+
+if (multiPages===true){
+  // 不等于 false 就split
+  if (typeof splitRuntime !== 'boolean'){
+    cfg.optimization
+      .runtimeChunk('single')
+  }
+  
 }
 
 patterns.forEach((item, i) => {

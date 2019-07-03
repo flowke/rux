@@ -14,8 +14,11 @@ let schema = {
     additionalProperties: 'config can not contain additional properties.'
 
   },
-  splitRuntime: false,
+  
   properties: {
+    splitRuntime: {
+      type: 'boolean'
+    },
     devServer:{
       type: 'object'
     },
