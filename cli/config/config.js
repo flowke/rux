@@ -18,7 +18,8 @@ let {
   clientEnv,
   globalVar,
   paths,
-  compatibility
+  compatibility,
+  multiPages
 } = options;
 
 
@@ -137,9 +138,9 @@ cfg.merge({
     filename: isProdMode
       ? jsPath+'.js'
       : 'bundle.js',
-    chunkFilename: isProdMode
-      ? jsPath+'.[id].chunk.js'
-      : '[name].chunk.js',
+    // chunkFilename: isProdMode
+    //   ? jsPath+'.[id].chunk.js'
+    //   : '[name].chunk.js',
   },
 
   resolve: {
@@ -294,7 +295,14 @@ cfg.merge({
   optimization: {
     splitChunks: {
       chunks: 'all',
-      automaticNameDelimiter: '.'
+      automaticNameDelimiter: '.',
+      cacheGroups: {
+        vendors: {
+          name: 'vendors',
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+        }
+      }
     }
   },
 
@@ -338,16 +346,6 @@ cfg.merge({
       }
     }: {},
 
-    ...isProdMode ? {
-      MiniCssExtractPlugin: {
-        plugin: MiniCssExtractPlugin,
-        args: [{
-          filename: cssPath+'.css',
-          chunkFilename: cssPath+'.[id].chunk.css',
-        }]
-      }
-    }: {},
-
     FriendlyErrorsWebpackPlugin: {
       plugin: FriendlyErrorsWebpackPlugin
     },
@@ -388,6 +386,30 @@ cfg.merge({
   }
 
 })
+
+if (isProdMode){
+  cfg.merge({
+    plugin: {
+      MiniCssExtractPlugin: {
+        plugin: MiniCssExtractPlugin,
+        args: [{
+          filename: cssPath + '.css',
+          chunkFilename: cssPath + '.[id].chunk.css',
+        }]
+      },
+      HashedModuleIdsPlugin: {
+        plugin: webpack.HashedModuleIdsPlugin,
+      }
+    }
+  })
+}
+
+// add plugin
+
+if (multiPages===true){
+  cfg.optimization
+    .runtimeChunk('single')
+}
 
 patterns.forEach((item, i) => {
 
@@ -468,7 +490,7 @@ create.html = {
               minifyCSS: true,
               minifyURLs: true,
             },
-            minify: false
+            // minify: false
           } : {},
           ...op
         }])

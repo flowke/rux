@@ -5,8 +5,7 @@ const fs = require('fs');
 module.exports = function(cb){
   let config = require('../config/vue.config.js');
   
-  rimraf.sync(creageOP().paths.outputPath+ '/*')
-  console.log(config.module.rules[0]);
+  rimraf.sync(creageOP().paths.outputPath+ '/**')
   
   webpack(config,(err, stats)=>{
     // if (err) {

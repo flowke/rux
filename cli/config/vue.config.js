@@ -18,6 +18,7 @@ config.config.module
     .oneOf('js')
       .include
         .add(/\.entry\.js$/)
+        .add(/\.temp\/\..+\.js$/)
         .end()
       .use('babel')
         .tap(op => {

@@ -47,8 +47,6 @@ module.exports = (cb)=>{
           path: arr[1] || `${arr[0]}/index.vue`
         }
       });
-
-      console.log(pageCfg);
       
 
       conf.add(chain => {
@@ -68,7 +66,14 @@ module.exports = (cb)=>{
         let htmlPath = path.resolve(appRoot, `pages/${e.name}/index.html`);
         htmlPath = fse.existsSync(htmlPath) ? htmlPath : '';
 
-        let htmlOption = {}
+        let htmlOption = {
+          filename: `${e.name}.html`,
+          // chunks: [e.name, 'vendors'],
+          excludeChunks: pageCfg.reduce((acc,elt)=>{
+            if(e.name!==elt.name) acc.push(elt.name)
+            return acc
+          },[])
+        }
         if (htmlPath) htmlOption.template = htmlPath
 
         conf.html.add(`html${e.name}`, htmlOption);
