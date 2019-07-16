@@ -97,15 +97,23 @@ module.exports = function create() {
 
   // init file
   if (appFiles.init()) {
-    delete require.cache[appFiles.init('abs')];
-    let fn = require(appFiles.init('abs'))
 
-    chunks.import(`import init from '@/init'`)
+    chunks.import(`import init from '@/init'`);
 
-    context.appExportDefault = fn.default;
-    if (type(fn.default, 'function')) {
-      chunks.subCode(`init && init(vm, Vue);`)
-    }
+    chunks.code(`function initCallBack(cb, p){
+
+    }`)
+
+    let callCode = '';
+
+    chunks.subCode(`init && 
+      $util.isType(init, 'function', 'promise') && 
+      Promise.resolve(init(Vue, initCallBack))
+      .then(function(){
+        
+        createVM();
+      });`)
+    chunks.subCode(``)
 
   }
 
@@ -114,6 +122,5 @@ module.exports = function create() {
   return {
     code: chunks.genCode(),
     serviceNamespace: context.namespace,
-    appExportDefault: context.appExportDefault
   }
 }

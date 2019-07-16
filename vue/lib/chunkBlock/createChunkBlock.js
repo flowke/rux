@@ -22,10 +22,12 @@ class Block{
   }
 
   vueIns(){
-    return `let vm = new Vue({
-      el: '#root',
-      ${this.optStr}
-    })\n`
+    return `function createVM(){
+      return new Vue({
+        el: '#root',
+        ${this.optStr}
+      })
+    }\n` 
   }
 
   subCode(str, nl = true){
