@@ -38,3 +38,4 @@ watchFile(createOption().appRoot, debounce.exec(500, (emitPath, pathKey) => {
   });
 
 }) )
+

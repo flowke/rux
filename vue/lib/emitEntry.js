@@ -25,7 +25,7 @@ module.exports = (cb)=>{
     let pageCfg = null;
 
     if (mayPath.multiPages(true)){
-      pageCfg = require(path.resolve(appRoot, 'pages/pages.config.js'));
+      pageCfg = require(path.resolve(appRoot, 'src/pages/pages.config.js'));
     }else{
       let files = glob.sync('*/index.vue', {
         cwd: path.resolve( appRoot, 'src/pages'),
@@ -79,7 +79,14 @@ module.exports = (cb)=>{
         conf.html.add(`html${e.name}`, htmlOption);
 
         taskList.push(fse.outputFile(entry, create().code))
-      })      
+      })  
+      
+      conf.html.add(`multiEntry}`, {
+        chunks: [],
+        pages: pageCfg.map(e=>e.name+'.html'),
+        template: path.resolve(__dirname, 'multi.html'),
+
+      });
 
       
     }
