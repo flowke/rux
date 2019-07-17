@@ -37,7 +37,7 @@ module.exports = function () {
     restart: ()=>{
       dbug('restart')
       let options = createOption();
-      let config = require('../config/vue.config.js').toConfig();
+      let config = require('../config/vue.config.js');
       dbug('get new options and config')
       server.restart(options.devServer, config)
     },
