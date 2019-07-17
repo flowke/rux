@@ -75,7 +75,8 @@ module.exports = function create() {
     chunks.import(`import Router from 'vue-router'`)
     chunks.import(`import routerOption from '@/router/index'`)
     chunks.code(`Vue.use(Router)`)
-    chunks.vueOptions(`router: new Router(routerOption),`)
+    chunks.code(`let router = new Router(routerOption)`)
+    chunks.vueOptions(`router,`)
     chunks.vueOptions(`render: h=>(<router-view></router-view>),`)
     
   }else{
@@ -87,12 +88,13 @@ module.exports = function create() {
     chunks.import(`import storeConfig from '@/store/index'`)
     chunks.code(`Vue.use(Vuex)`)
     chunks.code(`storeConfig.modules = {}`)
+    chunks.code(`let store = new Vuex.Store(storeConfig);`)
     appFiles.vuex.modules.forEach(m=>{
       chunks.import(`import __vuex_m_${m.name} from '@@/${m.file()}'`)
       chunks.code(`storeConfig.modules.${m.name} = __vuex_m_${m.name}`)
     })
 
-    chunks.vueOptions(`store: new Vuex.Store(storeConfig),`)
+    chunks.vueOptions(`store,`)
   }
 
   // init file
@@ -100,21 +102,36 @@ module.exports = function create() {
 
     chunks.import(`import init from '@/init'`);
 
-    chunks.code(`function initCallBack(cb, p){
+    let ctxCode = '';
 
+    if (router && appFiles.router()) ctxCode += 'router,\n';
+    if (vuex && appFiles.vuex.config()) ctxCode += 'store,\n';
+
+    chunks.code(`function doneFN(cb){
+      let vm = createVM();
+      cb && cb({
+        vm,
+        ${ctxCode}
+      });
     }`)
 
-    let callCode = '';
+    chunks.subCode(
+      `
+      if(init && $util.isType(init, 'function')){
 
-    chunks.subCode(`init && 
-      $util.isType(init, 'function', 'promise') && 
-      Promise.resolve(init(Vue, initCallBack))
-      .then(function(){
-        
-        createVM();
-      });`)
-    chunks.subCode(``)
+        let argsLength = init.length;
 
+        if(argsLength>=2){
+          init(Vue, doneFN)
+        }else{
+          init(Vue)
+          createVM()
+        }
+      }`
+    )
+
+  }else{
+    chunks.subCode(`createVM();`);
   }
 
 

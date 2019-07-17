@@ -87,10 +87,7 @@ module.exports = (cb)=>{
         template: path.resolve(__dirname, 'multi.html'),
 
       });
-
-      
     }
-
 
   }else{
     let entry = path.resolve(entryBase, '.temp/.entry.js');
