@@ -21,7 +21,7 @@ module.exports = function () {
 
   server.hooks.listened.tap('serverStarted', (parsedUrl) => {
     dbug('listened')
-    
+
   })
   server.hooks.firstTimeBuildDone.tap('serverStarted', (parsedUrl) => {
     dbug('firstTimeBuildDone')
