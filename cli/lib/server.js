@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const chalk = require('chalk');
 
-let dbug = require('debug')('server:')
+let dbug = require('debug')('server')
 
 const {
   SyncHook
@@ -35,7 +35,6 @@ module.exports = class Server {
     let {
       host
     } = serverConfig;
-    // WebpackDevServer.addDevServerEntrypoints(webpackConfig, serverConfig);
     let compiler = this.createCompiler(webpack, webpackConfig);
     const devServer = new WebpackDevServer(compiler, serverConfig);
 
