@@ -112,17 +112,14 @@ let getStyleLoaders = (cssOptions, preLoader = {}) => {
         loader: MiniCssExtractPlugin.loader,
         options: {
           publicPath: () => {
-            let pos = path.resolve(paths.outputPath, cssPath.replace(/\/[^/]*$/, '/x.x'));
+            let pos = path.resolve(paths.outputPath, cssPath.replace(/\/[^/]*$/, ''));
 
-            let op = paths.outputPath.replace(/.$/, (m) => {
+            let rel = path.relative(pos, paths.outputPath).replace(/.$/, (m) => {
               if (m !== '/') m = `${m}/`
               return m
             })
 
-            return path.relative(pos, op).replace(/.$/, (m) => {
-              if (m !== '/') m = `${m}/`
-              return m
-            })
+            return rel
           }
         },
       }
