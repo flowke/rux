@@ -88,12 +88,11 @@ module.exports = function create() {
     chunks.import(`import storeConfig from '@/store/index'`)
     chunks.code(`Vue.use(Vuex)`)
     chunks.code(`storeConfig.modules = {}`)
-    chunks.code(`let store = new Vuex.Store(storeConfig);`)
     appFiles.vuex.modules.forEach(m=>{
       chunks.import(`import __vuex_m_${m.name} from '@@/${m.file()}'`)
       chunks.code(`storeConfig.modules.${m.name} = __vuex_m_${m.name}`)
     })
-
+    chunks.code(`let store = new Vuex.Store(storeConfig);`)
     chunks.vueOptions(`store,`)
   }
 

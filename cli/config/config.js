@@ -1,5 +1,5 @@
-const Config = require('webpack-chain'); 
-const env = require('./env'); 
+const Config = require('webpack-chain');
+const env = require('./env');
 const path = require('path');
 const PnpWebpackPlugin = require('./plugin/pnp');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -54,9 +54,9 @@ let {
 assetsDir = assetsDir === null ? '' : assetsDir
 assetsDir = assetsDir.replace(/^\//, '')
 assetsDir = assetsDir.replace(/\/$/, '')
-if (assetsDir) assetsDir = assetsDir+'/'
+if (assetsDir) assetsDir = assetsDir + '/'
 
-let hashPattern = rt(()=>{
+let hashPattern = rt(() => {
 
   if (contentHash === true) return '[contenthash:8]';
 
@@ -81,7 +81,7 @@ cssPath = cssPath.replace(/(\.|\.css)$/, '')
 
 let fontsPath = fonts || `${assetsDir}fonts/[name].${fileHash}`;
 fontsPath = fontsPath.replace(/(\.|(\.\[ext\]))$/, '')
-fontsPath+='.[ext]'
+fontsPath += '.[ext]'
 
 let imgPath = img || `${assetsDir}img/[name].${fileHash}`;
 imgPath = imgPath.replace(/(\.|(\.\[ext\]))$/, '')
@@ -95,25 +95,38 @@ let otherPath = otherFiles || `${assetsDir}other-files/[name].${fileHash}`;
 otherPath = otherPath.replace(/(\.|(\.\[ext\]))$/, '')
 otherPath += '.[ext]'
 
-function rt(cb){
+function rt(cb) {
   return cb && cb()
 }
 
-
-let getStyleLoaders = (cssOptions, preLoader={}) => {
+let getStyleLoaders = (cssOptions, preLoader = {}) => {
   let loaders = {
-    ...!isProdMode?{
+    ...!isProdMode ? {
       styleLoader: {
         loader: require.resolve('style-loader')
       }
-    }: {},
+    } : {},
 
     ...isProdMode ? {
-      nimiCss:{
+      nimiCss: {
         loader: MiniCssExtractPlugin.loader,
-        options: { },
+        options: {
+          publicPath: () => {
+            let pos = path.resolve(paths.outputPath, cssPath.replace(/\/[^/]*$/, '/x.x'));
+
+            let op = paths.outputPath.replace(/.$/, (m) => {
+              if (m !== '/') m = `${m}/`
+              return m
+            })
+
+            return path.relative(pos, op).replace(/.$/, (m) => {
+              if (m !== '/') m = `${m}/`
+              return m
+            })
+          }
+        },
       }
-    }: {},
+    } : {},
     cssLoader: {
       loader: require.resolve('css-loader'),
       options: cssOptions,
@@ -137,7 +150,7 @@ cfg.merge({
     path: paths.outputPath,
     publicPath: paths.publicPath,
     filename: isProdMode
-      ? jsPath+'.js'
+      ? jsPath + '.js'
       : 'bundle.js',
     // chunkFilename: isProdMode
     //   ? jsPath+'.[id].chunk.js'
@@ -158,7 +171,7 @@ cfg.merge({
     rule: {
       // name: baseLoader
       baseLoaders: {
-        
+
         oneOf: {
           // name: image, 
           image: {
@@ -166,21 +179,21 @@ cfg.merge({
             loader: require.resolve('url-loader'),
             options: {
               limit: 10000,
-              name: imgPath,
+              name: imgPath
             },
           },
           fonts: {
             test: /\.(ttf|eot|woff|woff2)$/,
             loader: require.resolve('file-loader'),
             options: {
-              name: fontsPath,
+              name: fontsPath
             },
           },
           media: {
             test: /\.(mp3|ogg|wav|avi|mpeg|mov|mkv|wmv|flv|rmvb|webm|mp4)$/,
             loader: require.resolve('file-loader'),
             options: {
-              name: mediaPath,
+              name: mediaPath
             },
           },
 
@@ -190,14 +203,14 @@ cfg.merge({
             test: /\.(js)$/,
             include: [paths.appSrc, /puta\/lib\/index/],
             use: {
-              'babel':{
+              'babel': {
                 loader: require.resolve('babel-loader'),
                 options: babelConfig({
                   compatibility
                 }),
               }
             },
-            
+
           },
           // name: css
           css: {
@@ -286,6 +299,7 @@ cfg.merge({
             exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
             options: {
               name: otherPath,
+
             },
           }
         }
@@ -313,7 +327,7 @@ cfg.merge({
       args: [
         {
           template: paths.appHtml,
-          ...isProdMode? {
+          ...isProdMode ? {
             minify: {
               removeComments: true,
               collapseWhitespace: true,
@@ -326,7 +340,7 @@ cfg.merge({
               minifyCSS: true,
               minifyURLs: true,
             },
-          }: {}
+          } : {}
         }
       ]
     },
@@ -345,27 +359,27 @@ cfg.merge({
       HotModuleReplacementPlugin: {
         plugin: webpack.HotModuleReplacementPlugin
       }
-    }: {},
+    } : {},
 
     FriendlyErrorsWebpackPlugin: {
       plugin: FriendlyErrorsWebpackPlugin
     },
     ProgressPlugin: {
-      plugin: function(){
+      plugin: function () {
         let span = ora({ spinner: 'point' });
         let hasStart = false;
         return new webpack.ProgressPlugin((percent, msg) => {
           let fixed = chalk.bold.green(`${(percent * 100).toFixed()}%`)
-          
-          if (percent == 1 || msg === 'after emitting'){
+
+          if (percent == 1 || msg === 'after emitting') {
             span.stop()
             span.clear()
             return;
           }
 
-          if(hasStart){
+          if (hasStart) {
             span.text = fixed
-          }else{
+          } else {
             hasStart = true;
             span.start(fixed)
           }
@@ -388,7 +402,7 @@ cfg.merge({
 
 })
 
-if (isProdMode){
+if (isProdMode) {
   cfg.merge({
     plugin: {
       MiniCssExtractPlugin: {
@@ -407,18 +421,18 @@ if (isProdMode){
 
 // add plugin
 
-if (splitRuntime===true){
+if (splitRuntime === true) {
   cfg.optimization
     .runtimeChunk('single')
 }
 
-if (multiPages===true){
+if (multiPages === true) {
   // 不等于 false 就split
-  if (typeof splitRuntime !== 'boolean'){
+  if (typeof splitRuntime !== 'boolean') {
     cfg.optimization
       .runtimeChunk('single')
   }
-  
+
 }
 
 patterns.forEach((item, i) => {
@@ -434,23 +448,25 @@ patterns.forEach((item, i) => {
   cfg.module.rule('baseLoaders').oneOf(i)
     .test(test)
     .use('file')
-      .loader(require.resolve('file-loader'))
-      .options({ name: item[1]})
-      .end()
+    .loader(require.resolve('file-loader'))
+    .options({
+      name: item[1]
+    })
+    .end()
     .before('fileCallBack')
 
- 
+
 })
 
 
-class Inject{
-  constructor(){
+class Inject {
+  constructor() {
     this.before = [];
     this.post = [];
     this.injection = [];
   }
 
-  add(cb, flag ='injection'){
+  add(cb, flag = 'injection') {
     let cachingArr = this.injection;
     if (flag === 'before') cachingArr = this.before;
     if (flag === 'post') cachingArr = this.post;
@@ -458,7 +474,7 @@ class Inject{
     cb && cachingArr.push(cb)
   }
 
-  getCaching(){
+  getCaching() {
     return this.before.concat(this.injection, this.post)
   }
 
@@ -469,7 +485,7 @@ let injection = new Inject
 // the exports
 
 function create() {
-  injection.getCaching().forEach(e=>{
+  injection.getCaching().forEach(e => {
 
     e(cfg)
   })
@@ -481,9 +497,9 @@ create.add = injection.add.bind(injection)
 create.config = cfg
 
 create.html = {
-  add: (name,op={})=>{
+  add: (name, op = {}) => {
 
-    injection.add(chain=>{
+    injection.add(chain => {
       chain.plugin(name)
         .use(HtmlWebpackPlugin, [{
           template: paths.appHtml,
