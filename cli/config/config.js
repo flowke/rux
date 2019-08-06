@@ -110,7 +110,21 @@ let getStyleLoaders = (cssOptions, preLoader = {}) => {
     ...isProdMode ? {
       nimiCss: {
         loader: MiniCssExtractPlugin.loader,
-        options: {},
+        options: {
+          publicPath: () => {
+            let pos = path.resolve(paths.outputPath, cssPath.replace(/\/[^/]*$/, '/x.x'));
+
+            let op = paths.outputPath.replace(/.$/, (m) => {
+              if (m !== '/') m = `${m}/`
+              return m
+            })
+
+            return path.relative(pos, op).replace(/.$/, (m) => {
+              if (m !== '/') m = `${m}/`
+              return m
+            })
+          }
+        },
       }
     } : {},
     cssLoader: {
@@ -165,24 +179,21 @@ cfg.merge({
             loader: require.resolve('url-loader'),
             options: {
               limit: 10000,
-              name: path.basename(imgPath),
-              outputPath: path.dirname(imgPath),
+              name: imgPath
             },
           },
           fonts: {
             test: /\.(ttf|eot|woff|woff2)$/,
             loader: require.resolve('file-loader'),
             options: {
-              name: path.basename(fontsPath),
-              outputPath: path.dirname(fontsPath),
+              name: fontsPath
             },
           },
           media: {
             test: /\.(mp3|ogg|wav|avi|mpeg|mov|mkv|wmv|flv|rmvb|webm|mp4)$/,
             loader: require.resolve('file-loader'),
             options: {
-              name: path.basename(mediaPath),
-              outputPath: path.dirname(mediaPath),
+              name: mediaPath
             },
           },
 
@@ -287,8 +298,7 @@ cfg.merge({
             loader: require.resolve('file-loader'),
             exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
             options: {
-              name: path.basename(otherPath),
-              outputPath: path.dirname(otherPath),
+              name: otherPath,
 
             },
           }
@@ -440,8 +450,7 @@ patterns.forEach((item, i) => {
     .use('file')
     .loader(require.resolve('file-loader'))
     .options({
-      name: path.basename(item[1]),
-      outputPath: path.dirname(item[1]),
+      name: item[1]
     })
     .end()
     .before('fileCallBack')
