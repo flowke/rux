@@ -12,7 +12,6 @@ const os = require('os');
 const ora = require('ora');
 const swig = require('swig');
 
-
 const spinner = ora();
 
 function logExistDir(dir) {

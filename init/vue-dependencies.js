@@ -12,11 +12,13 @@ module.exports = {
   commonLibs: {
     vue: '^2.6.10',
     puta: 'latest',
-    '@babel/runtime': 'latest'
+    '@babel/runtime': 'latest',
+    '@fow/visitor': 'latest',
   },
 
   devCommonLibs: {
     "vue-template-compiler": "^2.6.10",
+    "tha": "latest",
   },
 
   type: {

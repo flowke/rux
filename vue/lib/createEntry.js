@@ -116,7 +116,7 @@ module.exports = function create() {
 
     chunks.subCode(
       `
-      if(init && $util.isType(init, 'function')){
+      if(typeof init === 'function'){
 
         let argsLength = init.length;
 
