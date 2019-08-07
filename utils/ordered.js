@@ -16,7 +16,6 @@ module.exports = function ordered(arr, op={}){
 
   return arr.reduce((acc, fn, i)=>{
 
-
     return acc.then(()=>{
       let out = fn();
       if(!paraller){

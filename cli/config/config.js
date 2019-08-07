@@ -95,10 +95,6 @@ let otherPath = otherFiles || `${assetsDir}other-files/[name].${fileHash}`;
 otherPath = otherPath.replace(/(\.|(\.\[ext\]))$/, '')
 otherPath += '.[ext]'
 
-function rt(cb) {
-  return cb && cb()
-}
-
 let getStyleLoaders = (cssOptions, preLoader = {}) => {
   let loaders = {
     ...!isProdMode ? {
