@@ -18,7 +18,8 @@ module.exports = function (cfg={}) {
         useBuiltIns: level ? 'usage': false,
         corejs: level? level : undefined,
         targets
-      }]
+      }],
+      // "@vue/babel-preset-jsx"
     ],
 
     plugins: [

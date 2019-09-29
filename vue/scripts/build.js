@@ -7,6 +7,8 @@ const emitEntry = require('../lib/emitEntry');
 
 emitEntry()
 .then(()=>{
-  build()
+  
+  build();
+
 })
 

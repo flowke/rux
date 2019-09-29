@@ -19,6 +19,7 @@ config.config.module
       .include
         .add(/\.entry\.js$/)
         .add(/\.temp\/\..+\.js$/)
+
         .end()
       .use('babel')
         .tap(op => {

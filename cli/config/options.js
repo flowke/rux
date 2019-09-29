@@ -55,7 +55,6 @@ let schema = {
           }
         },
       }
-      
     },
     appRoot: {
       type: 'string',
